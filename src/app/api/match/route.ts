@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import collegesData from '@/data/colleges.json';
 
 export async function POST(request: Request) {
   try {
@@ -14,65 +12,65 @@ export async function POST(request: Request) {
       specialty 
     } = body;
 
-    // Fetch all colleges (in a real app, you might pre-filter by tuition via DB query)
-    const allColleges = await prisma.college.findMany();
+    const allColleges = collegesData as any[];
 
     const scoredColleges = allColleges.map((college) => {
       let score = 100;
       let reasons: string[] = [];
 
-      // 1. Tuition Check (Hard filter or heavy penalty)
+      // 1. Tuition Check
       if (college.tuition > maxTuition) {
-        score -= 40; // Heavy penalty if over budget
+        score -= 40; 
         reasons.push("Over budget");
       } else {
         reasons.push("Within budget");
       }
 
-      // 2. Setting Match
-      const collegeSetting = college.setting || "Any";
-      if (preferredSetting !== "Any" && collegeSetting !== preferredSetting && collegeSetting !== "Any") {
+      // 2. Setting Match (locationVibe)
+      const collegeSetting = college.locationVibe || "Any";
+      if (preferredSetting !== "Any" && !collegeSetting.includes(preferredSetting)) {
         score -= 15;
-      } else if (preferredSetting !== "Any" && collegeSetting === preferredSetting) {
+      } else if (preferredSetting !== "Any" && collegeSetting.includes(preferredSetting)) {
         reasons.push(`Matches ${preferredSetting} setting`);
       }
 
-      // 3. Social Life Match (1 to 5)
-      // Neutral fallback if missing
-      const social = college.socialLife ?? 3;
+      // 3. Social Life Match (Map categorical to 1-5)
+      let social = 3;
+      if (college.socialVibe === "Greek Life Heavy") social = 5;
+      else if (college.socialVibe === "Quiet") social = 1;
+      
       const socialDiff = Math.abs(socialLifeImportance - social);
       score -= socialDiff * 4; 
       
       // 4. Sports Culture Match
-      const sports = college.sportsCulture ?? 3;
+      let sports = 3;
+      if (college.athleticsVibe === "D1 Powerhouse") sports = 5;
+      else if (college.athleticsVibe === "Non-Athletic/Artsy") sports = 1;
+      
       const sportsDiff = Math.abs(sportsImportance - sports);
       score -= sportsDiff * 4;
 
-      // 5. Specialty Match
-      const specialties = college.specialties || "";
+      // 5. Specialty Match (topMajors)
+      const topMajors = college.topMajors || "";
       if (specialty && specialty !== "Undecided") {
-        if (specialties && !specialties.includes(specialty)) {
+        if (!topMajors.includes(specialty)) {
           score -= 20;
-        } else if (specialties.includes(specialty)) {
-          score += 10; // Bonus for having the specialty
+        } else {
+          score += 10;
           reasons.push(`Strong ${specialty} program`);
         }
       }
 
-      // Normalize score to 0-100 max
       const finalScore = Math.min(Math.max(score, 0), 100);
 
       return {
         ...college,
         matchScore: finalScore,
-        matchReasons: reasons.slice(0, 3) // Top 3 reasons
+        matchReasons: reasons.slice(0, 3)
       };
     });
 
-    // Sort by highest score first
     scoredColleges.sort((a, b) => b.matchScore - a.matchScore);
-
-    // Return Top 12 matches
     return NextResponse.json({ matches: scoredColleges.slice(0, 12) });
   } catch (error) {
     console.error("Error in matching algorithm:", error);
