@@ -1,0 +1,301 @@
+Rank	Institution	State	Federal School Code
+1	Princeton University	NJ	2627
+2	Massachusetts Institute of Technology (MIT)	MA	2178
+3	Harvard University	MA	2155
+4	Stanford University	CA	1305
+5	Yale University	CT	1426
+6	California Institute of Technology (Caltech)	CA	1131
+7	Duke University	NC	2920
+8	Johns Hopkins University	MD	2077
+9	University of Pennsylvania (UPenn)	PA	3378
+10	Northwestern University	IL	1739
+11	University of Chicago	IL	1774
+12	Brown University	RI	3401
+13	Cornell University	NY	2711
+14	Rice University	TX	3604
+15	Dartmouth College	NH	2573
+16	Vanderbilt University	TN	3535
+17	University of Notre Dame	IN	1840
+18	Columbia University	NY	2707
+19	Washington University in St. Louis	MO	2520
+20	University of California, Los Angeles (UCLA)	CA	1315
+21	University of California, Berkeley	CA	1312
+22	University of Michigan—Ann Arbor	MI	2325
+23	Emory University	GA	1564
+24	Georgetown University	DC	1445
+25	University of Virginia	VA	3745
+26	Carnegie Mellon University	PA	3242
+27	University of North Carolina at Chapel Hill	NC	2974
+28	Wake Forest University	NC	2978
+29	New York University (NYU)	NY	2838
+30	University of Florida	FL	1535
+31	University of Southern California (USC)	CA	1328
+32	Tufts University	MA	2219
+33	University of California, San Diego	CA	1317
+34	University of California, Davis	CA	1313
+35	University of Texas at Austin	TX	3658
+36	University of Wisconsin—Madison	WI	3895
+37	University of Illinois Urbana-Champaign	IL	1775
+38	College of William & Mary	VA	3705
+39	Georgia Institute of Technology	GA	1569
+40	Case Western Reserve University	OH	3137
+41	Boston University	MA	2130
+42	Ohio State University	OH	3090
+43	Purdue University—West Lafayette	IN	1825
+44	University of Rochester	NY	2894
+45	Lehigh University	PA	3289
+46	Texas A&M University	TX	3632
+47	Boston College	MA	2128
+48	Rutgers University—New Brunswick	NJ	2629
+49	University of Georgia	GA	1598
+50	Villanova University	PA	3388
+51	University of Washington	WA	3798
+52	Florida State University	FL	1489
+53	Rensselaer Polytechnic Institute (RPI)	NY	2803
+54	Pepperdine University	CA	1264
+55	Santa Clara University	CA	1326
+56	University of Miami	FL	1536
+57	Northeastern University	MA	2199
+58	Tulane University	LA	2029
+59	University of Maryland—College Park	MD	2103
+60	Virginia Tech	VA	3754
+61	Syracuse University	NY	2882
+62	University of Connecticut	CT	1417
+63	University of Pittsburgh	PA	8815
+64	Southern Methodist University (SMU)	TX	3613
+65	George Washington University	DC	1444
+66	Clemson University	SC	3425
+67	Worcester Polytechnic Institute (WPI)	MA	2233
+68	University of Minnesota—Twin Cities	MN	2388
+69	North Carolina State University	NC	2972
+70	Brigham Young University—Provo	UT	3670
+71	Stevens Institute of Technology	NJ	2639
+72	University of California, Santa Cruz	CA	1321
+73	University of Iowa	IA	1892
+74	Michigan State University	MI	2290
+75	University of Delaware	DE	1431
+76	American University	DC	1434
+77	Baylor University	TX	3545
+78	Fordham University	NY	2722
+79	Yeshiva University	NY	2903
+80	University of Colorado Boulder	CO	1370
+81	Stony Brook University—SUNY	NY	2838
+82	University of Oregon	OR	3210
+83	Indiana University—Bloomington	IN	1809
+84	Marquette University	WI	3863
+85	Temple University	PA	3371
+86	University of San Francisco	CA	1325
+87	Howard University	DC	1448
+88	University of South Carolina	SC	3448
+89	Auburn University	AL	1009
+90	University of Utah	UT	3675
+91	University of Arizona	AZ	1083
+92	University of Massachusetts—Amherst	MA	2221
+93	Drexel University	PA	3256
+94	Arizona State University—Tempe	AZ	1081
+95	Saint Louis University	MO	2506
+96	Loyola University Chicago	IL	1710
+97	University of Kentucky	KY	1989
+98	University of Tennessee—Knoxville	TN	3530
+99	University of Oklahoma	OK	3184
+100	University of Nebraska—Lincoln	NE	2565
+101	University of South Florida	FL	1537
+102	University at Buffalo (SUNY)	NY	2837
+103	University of California, Riverside	CA	1316
+104	New Jersey Institute of Technology (NJIT)	NJ	2621
+105	University of Illinois Chicago (UIC)	IL	1776
+106	University of San Diego	CA	10395
+107	George Mason University	VA	3749
+108	University of Utah	UT	3675
+109	University of Missouri	MO	2516
+110	University of Alabama	AL	1051
+111	University of Kansas	KS	1948
+112	University of Cincinnati	OH	3125
+113	University of Oregon	OR	3210
+114	Clarkson University	NY	2699
+115	Colorado School of Mines	CO	1352
+116	University of Massachusetts—Lowell	MA	2161
+117	University of Central Florida	FL	3954
+118	Oregon State University	OR	3210
+119	University of New Hampshire	NH	2589
+120	Michigan Technological University	MI	2292
+121	University of Oklahoma	OK	3184
+122	Arizona State University	AZ	1081
+123	DePaul University	IL	1671
+124	Chapman University	CA	1164
+125	University of Vermont	VT	3696
+126	University of Arkansas	AR	1108
+127	Washington State University	WA	3800
+128	Thomas Jefferson University	PA	13549
+129	Creighton University	NE	2542
+130	Temple University	PA	3371
+131	University of Dayton	OH	3035
+132	Catholic University of America	DC	1437
+133	University of South Carolina	SC	3448
+134	Loyola Marymount University	CA	1234
+135	Duquesne University	PA	3258
+136	San Diego State University	CA	1151
+137	University of Rhode Island	RI	3407
+138	University of St. Thomas	MN	2345
+139	Kansas State University	KS	1928
+140	University of Louisville	KY	1999
+141	Mississippi State University	MS	2423
+142	University of Nebraska—Lincoln	NE	2565
+143	Seton Hall University	NJ	2632
+144	University of Houston	TX	3652
+145	Illinois Institute of Technology	IL	1691
+146	Oklahoma State University	OK	3170
+147	University of Alabama at Birmingham (UAB)	AL	1052
+148	University of San Francisco	CA	1325
+149	Seattle University	WA	3790
+150	Mercer University	GA	2580
+151	University of Mississippi (Ole Miss)	MS	2440
+152	University of Kentucky	KY	1989
+153	University of North Carolina at Charlotte	NC	2975
+154	Florida International University	FL	9635
+155	Biola University	CA	1122
+156	University of Nevada, Las Vegas (UNLV)	NV	2569
+157	George Fox University	OR	3194
+158	University of Wyoming	WY	3932
+159	Louisiana State University (LSU)	LA	2010
+160	Texas Christian University (TCU)	TX	3636
+161	University of North Carolina at Greensboro	NC	2976
+162	University of Montana	MT	2536
+163	New Mexico State University	NM	2657
+164	University of North Dakota	ND	3005
+165	University of Idaho	ID	1626
+166	South Dakota State University	SD	3471
+167	Montana State University	MT	2532
+168	Utah State University	UT	3677
+169	West Virginia University	WV	3827
+170	Ball State University	IN	1786
+171	University of Maine	ME	2053
+172	University of North Alabama	AL	1016
+173	Western Michigan University	MI	2330
+174	Kent State University	OH	3051
+175	University of Memphis	TN	3509
+176	Old Dominion University	VA	3728
+177	North Dakota State University	ND	2997
+178	University of South Alabama	AL	1057
+179	University of Southern Mississippi	MS	2441
+180	East Carolina University	NC	2923
+181	Wichita State University	KS	1950
+182	Boise State University	ID	1616
+183	Portland State University	OR	3216
+184	University of Toledo	OH	3131
+185	University of Missouri—Kansas City	MO	2518
+186	University of New Mexico	NM	2663
+187	Cleveland State University	OH	3032
+188	University of North Texas	TX	3594
+189	California State University, Fullerton	CA	1137
+190	University of Wisconsin—Milwaukee	WI	3896
+191	Wright State University	OH	3071
+192	Central Michigan University	MI	2243
+193	Northern Illinois University	IL	1737
+194	University of Alaska Fairbanks	AK	1063
+195	Texas Tech University	TX	3644
+196	University of Nevada, Reno	NV	2568
+197	University of Hawaii at Manoa	HI	1610
+198	University of North Carolina at Wilmington	NC	2984
+199	Pace University	NY	2791
+200	University of Colorado Denver	CO	4508
+201	Bentley University	MA	2124
+202	University of Mississippi (Ole Miss)	MS	2440
+203	University of North Carolina at Charlotte	NC	2975
+204	Texas Tech University	TX	3644
+205	University of Nevada, Reno	NV	2568
+206	University of Alabama at Birmingham (UAB)	AL	1052
+207	Georgia State University	GA	1574
+208	Ohio University	OH	3100
+209	University of North Dakota	ND	3005
+210	University of Missouri—St. Louis	MO	2519
+211	San Francisco State University	CA	1154
+212	University of Louisville	KY	1999
+213	Ball State University	IN	1786
+214	South Dakota State University	SD	3471
+215	Montana State University	MT	2532
+216	University of Maine	ME	2053
+217	Kent State University	OH	3051
+218	University of Memphis	TN	3509
+219	Boise State University	ID	1616
+220	Portland State University	OR	3216
+221	Wichita State University	KS	1950
+222	Pace University	NY	2791
+223	University of North Texas	TX	3594
+224	Northern Illinois University	IL	1737
+225	University of Alaska Fairbanks	AK	1063
+226	University of Colorado Denver	CO	4508
+227	East Carolina University	NC	2923
+228	Western Michigan University	MI	2330
+229	Central Michigan University	MI	2243
+230	Wright State University	OH	3071
+231	California State University, Sacramento	CA	1150
+232	University of South Alabama	AL	1057
+233	University of Southern Mississippi	MS	2441
+234	North Dakota State University	ND	2997
+235	University of New Mexico	NM	2663
+236	University of Toledo	OH	3131
+237	Cleveland State University	OH	3032
+238	University of Missouri—Kansas City	MO	2518
+239	California State University, Northridge	CA	1153
+240	University of Wisconsin—Milwaukee	WI	3896
+241	Illinois State University	IL	1692
+242	Wayne State University	MI	2329
+243	Southern Illinois University Carbondale	IL	1758
+244	New Mexico State University	NM	2657
+245	University of Rhode Island	RI	3407
+246	University of Montana	MT	2536
+247	Utah State University	UT	3677
+248	Florida Atlantic University	FL	1481
+249	Georgia Southern University	GA	1572
+250	Middle Tennessee State University	TN	3510
+251	Old Dominion University	VA	3728
+252	University of North Carolina at Greensboro	NC	2976
+253	University of Idaho	ID	1626
+254	University of Wyoming	WY	3932
+255	West Virginia University	WV	3827
+256	University of Nevada, Las Vegas (UNLV)	NV	2569
+257	Sam Houston State University	TX	3606
+258	University of North Alabama	AL	1016
+259	Oakland University	MI	2307
+260	Indiana State University	IN	1805
+261	Missouri State University	MO	2503
+262	Arkansas State University	AR	1090
+263	University of Louisiana at Lafayette	LA	2031
+264	Texas State University	TX	3615
+265	University of Massachusetts Dartmouth	MA	2175
+266	Montclair State University	NJ	2617
+267	Kennesaw State University	GA	1577
+268	University of Arkansas at Little Rock	AR	1101
+269	University of Northern Colorado	CO	1349
+270	Southern University and A&M College	LA	2025
+271	University of West Florida	FL	3955
+272	Grand Valley State University	MI	2268
+273	California State University, Fresno	CA	1147
+274	Tarleton State University	TX	3631
+275	Western Kentucky University	KY	2002
+276	University of Texas at El Paso (UTEP)	TX	3661
+277	University of Nebraska Omaha	NE	2554
+278	Marshall University	WV	3815
+279	Northern Arizona University	AZ	1082
+280	University of South Dakota	SD	3474
+281	Idaho State University	ID	1620
+282	Lamar University	TX	3581
+283	California State University, San Bernardino	CA	1142
+284	IUPUI (IU Indianapolis)	IN	1813
+285	University of Texas Rio Grande Valley	TX	3599
+286	University of New Orleans	LA	2026
+287	Florida Gulf Coast University	FL	32553
+288	Morehead State University	KY	1976
+289	Austin Peay State University	TN	1089
+290	University of Tennessee at Chattanooga	TN	3529
+291	University of Wisconsin—Oshkosh	WI	3920
+292	University of Central Arkansas	AR	1092
+293	South Carolina State University	SC	3446
+294	Alabama State University	AL	1005
+295	North Carolina A&T State University	NC	2905
+296	Jackson State University	MS	2410
+297	Tennessee State University	TN	3522
+298	Grambling State University	LA	2006
+299	Texas Southern University	TX	3642
+300	Florida A&M University	FL	1480

@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model College {
+  id             String   @id @default(cuid())
+  name           String
+  location       String
+  acceptanceRate Float
+  tuition        Int
+  students       Int
+  imageUrl       String
+  tags           String // Stored as a comma-separated string for simplicity in SQLite
+
+  // Categorical Vibe Metrics
+  locationVibe   String? // Urban, Suburban, College Town, Rural
+  socialVibe     String? // Greek Life Heavy, Work Hard Play Hard, Chill & Alternative, Quiet
+  athleticsVibe  String? // D1 Powerhouse, Intramural Focus, Non-Athletic/Artsy
+  academicVibe   String? // Highly Competitive, Collaborative, Intellectual, Pre-Professional
+  campusIdentity String? // Historic, Modern, Activist
+  
+  specialties    String? // Stored as comma-separated string: "Engineering,Business,Arts"
+  
+  careerPaths    CareerPath[]
+  
+  // Detailed Modal Metrics
+  logoUrl         String?
+  website         String?
+  satMath         Int?
+  satReading      Int?
+  actComposite    Int?
+  topMajors       String? // JSON string or comma-separated top 5
+  specialPrograms String? // LLM generated
+  clubs           String? // LLM generated
+  avgGpa          Float?  // LLM generated estimate
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model CareerPath {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  colleges College[]
+}

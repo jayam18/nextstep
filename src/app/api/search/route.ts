@@ -1,0 +1,61 @@
+import { NextResponse } from 'next/server';
+import collegesData from '@/data/colleges.json';
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const q = searchParams.get('q');
+    const state = searchParams.get('state'); // e.g. "California" or "CA"
+
+    const colleges = collegesData as any[];
+    // Pre-filter to only include colleges with an acceptance rate > 0
+    const validColleges = colleges.filter(c => c.acceptanceRate > 0);
+
+    if (q) {
+      const searchTerms = q.toLowerCase().split(' ').filter(t => t.trim() !== '');
+      
+      const results = validColleges.filter(college => {
+        // Every search term must match AT LEAST ONE field (AND logic across terms, OR logic across fields)
+        return searchTerms.every(term => {
+          const inName = college.name?.toLowerCase().includes(term);
+          const inLocation = college.location?.toLowerCase().includes(term);
+          const inTags = college.tags?.toLowerCase().includes(term);
+          const inLocVibe = college.locationVibe?.toLowerCase().includes(term);
+          const inSocVibe = college.socialVibe?.toLowerCase().includes(term);
+          const inAthVibe = college.athleticsVibe?.toLowerCase().includes(term);
+          const inAcadVibe = college.academicVibe?.toLowerCase().includes(term);
+          const inIdenVibe = college.campusIdentity?.toLowerCase().includes(term);
+          const inCareer = college.careerPaths?.some((p: any) => p.name.toLowerCase().includes(term));
+
+          return inName || inLocation || inTags || inLocVibe || inSocVibe || inAthVibe || inAcadVibe || inIdenVibe || inCareer;
+        });
+      });
+
+      return NextResponse.json({ results: results.slice(0, 12) });
+    } else if (state) {
+      // Curated by state
+      const stateMatch = validColleges.filter(c => 
+        c.location.includes(`, ${state}`) || c.location.includes(state)
+      );
+
+      // Sort by acceptance rate (asc)
+      stateMatch.sort((a, b) => a.acceptanceRate - b.acceptanceRate);
+
+      if (stateMatch.length === 0) {
+        // Fallback
+        validColleges.sort((a, b) => a.acceptanceRate - b.acceptanceRate);
+        return NextResponse.json({ results: validColleges.slice(0, 6), fallback: true });
+      }
+
+      return NextResponse.json({ results: stateMatch.slice(0, 6) });
+    }
+
+    // Default fallback if no params
+    validColleges.sort((a, b) => a.acceptanceRate - b.acceptanceRate);
+    return NextResponse.json({ results: validColleges.slice(0, 6) });
+
+  } catch (error) {
+    console.error("Search error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
