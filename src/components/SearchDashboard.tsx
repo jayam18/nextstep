@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, SlidersHorizontal, Sparkles, Loader2 } from 'lucide-react';
+import { Search, SlidersHorizontal, Sparkles, Loader2, ChevronDown } from 'lucide-react';
 import CollegeCard from './CollegeCard';
 import CollegeModal from './CollegeModal';
 
@@ -15,6 +15,7 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
   const [results, setResults] = useState<any[]>(initialColleges);
   const [isSearching, setIsSearching] = useState(false);
   const [userState, setUserState] = useState<string | null>(null);
+  const [userStateCode, setUserStateCode] = useState<string | null>(null);
   const [selectedCollege, setSelectedCollege] = useState<any | null>(null);
 
   // Fetch user location on mount
@@ -24,7 +25,8 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
         const res = await fetch('https://ipapi.co/json/');
         const data = await res.json();
         if (data && data.region_code) {
-          setUserState(data.region); // e.g. "California"
+          setUserState(data.region); // e.g. "Illinois"
+          setUserStateCode(data.region_code); // e.g. "IL"
           
           // Fetch curated for state
           const stateRes = await fetch(`/api/search?state=${data.region_code}`);
@@ -43,11 +45,9 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
   // Debounced search
   useEffect(() => {
     if (!query) {
-      // If query is cleared, fetch the state-curated list again (or show initial)
-      if (userState) {
+      if (userStateCode) {
         setIsSearching(true);
-        // We do a quick fetch, but we could also cache the state results
-        fetch(`/api/search?state=${userState}`)
+        fetch(`/api/search?state=${userStateCode}`)
           .then(res => res.json())
           .then(data => {
             if (data.results) setResults(data.results);
@@ -76,26 +76,25 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
     }, 400);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query, userState]); // Removed initialColleges to prevent React loop if parent re-renders
+  }, [query, userStateCode]); // Removed initialColleges to prevent React loop if parent re-renders
 
   return (
     <>
-      <section className="relative pt-24 pb-32 overflow-hidden">
+      <section className="relative pt-4 pb-2 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-blue-500/10 rounded-full blur-[120px] -z-10" />
         <div className="absolute top-40 left-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[120px] -z-10" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium mb-8">
-            <Sparkles className="w-4 h-4" />
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium mb-2">
+            <Sparkles className="w-3 h-3" />
             <span>AI-Powered (in future) College Matching</span>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
-            Find the college that <br className="hidden md:block" />
-            <span className="text-gradient">fits your vibe.</span>
+          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-2">
+            Find the college that <span className="text-gradient">fits your vibe.</span>
           </h1>
           
-          <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-gray-400 mb-4 max-w-2xl mx-auto hidden sm:block">
             Search by major, location, or vibe. We analyze millions of data points to find where you truly belong.
           </p>
 
@@ -110,7 +109,7 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search by name, city, state, or 'vibe' (e.g., 'Urban', 'STEM focus')..." 
-                className="w-full bg-transparent border-none text-white focus:ring-0 text-lg placeholder-gray-500 py-4 outline-none"
+                className="w-full bg-transparent border-none text-white focus:ring-0 text-base md:text-lg placeholder-gray-500 py-3 outline-none"
               />
               <button className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 transition-colors mr-2 border border-white/10">
                 <SlidersHorizontal className="w-4 h-4" />
@@ -118,11 +117,16 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
               </button>
             </div>
           </div>
+          
+          {/* Scroll Indicator */}
+          <div className="mt-8 flex justify-center animate-bounce opacity-60">
+            <ChevronDown className="w-6 h-6 text-gray-400" />
+          </div>
         </div>
       </section>
 
-      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-white/5 min-h-[500px]">
-        <div className="flex justify-between items-end mb-10">
+      <section className="pt-2 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[500px]">
+        <div className="flex justify-between items-end mb-4">
           <div>
             {query ? (
               <h2 className="text-3xl font-bold mb-2">Search Results</h2>
