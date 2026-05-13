@@ -10,6 +10,9 @@ async function main() {
   const colleges = await prisma.college.findMany({
     include: {
       careerPaths: true
+    },
+    orderBy: {
+      ranking: 'asc'
     }
   });
 

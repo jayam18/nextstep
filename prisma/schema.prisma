@@ -9,6 +9,7 @@ datasource db {
 
 model College {
   id             String   @id @default(cuid())
+  ranking        Int?
   name           String
   location       String
   acceptanceRate Float
@@ -38,6 +39,9 @@ model College {
   specialPrograms String? // LLM generated
   clubs           String? // LLM generated
   avgGpa          Float?  // LLM generated estimate
+  studentLifeSnippet String?
+  athleticsSnippet   String?
+  safetySnippet      String?
   
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

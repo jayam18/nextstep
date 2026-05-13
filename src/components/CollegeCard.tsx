@@ -10,6 +10,7 @@ interface CollegeCardProps {
   imageUrl: string;
   tags: string | string[]; // Can be array or comma-separated string from DB
   matchScore?: number; // From Fit Engine
+  ranking?: number;
   careerPaths?: { id: string, name: string }[];
   locationVibe?: string;
   socialVibe?: string;
@@ -29,6 +30,7 @@ export default function CollegeCard({
   imageUrl, 
   tags,
   matchScore,
+  ranking,
   careerPaths,
   locationVibe,
   socialVibe,
@@ -53,6 +55,13 @@ export default function CollegeCard({
           <div className="absolute top-4 right-4 z-10 bg-black/60 backdrop-blur-md border border-blue-500/30 text-white px-3 py-1.5 rounded-full text-sm font-bold flex items-center gap-1.5 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
             <span className="text-blue-400">★</span>
             {Math.round(matchScore)}% Match
+          </div>
+        )}
+
+        {/* Ranking Badge */}
+        {ranking !== undefined && (
+          <div className="absolute top-4 left-4 z-10 bg-black/40 backdrop-blur-md border border-white/10 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg">
+            #{ranking}
           </div>
         )}
 

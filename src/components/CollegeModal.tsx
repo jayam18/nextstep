@@ -1,4 +1,4 @@
-import { MapPin, Users, TrendingUp, DollarSign, X, ExternalLink, BookOpen, Activity, GraduationCap } from 'lucide-react';
+import { MapPin, Users, TrendingUp, DollarSign, X, ExternalLink, BookOpen, Activity, GraduationCap, ShieldCheck, Trophy, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
@@ -151,20 +151,39 @@ export default function CollegeModal({ college, onClose }: CollegeModalProps) {
                 )}
               </section>
 
-              {/* Clubs & Athletics */}
+              {/* Student Life */}
               <section>
                 <h3 className="flex items-center text-lg font-semibold text-white mb-3">
-                  <Users className="w-5 h-5 mr-2 text-orange-400" />
-                  Student Life & Athletics
+                  <Sparkles className="w-5 h-5 mr-2 text-pink-400" />
+                  Campus Vibe
+                </h3>
+                <p className="text-gray-300 text-sm leading-relaxed mb-3">
+                  {college.studentLifeSnippet || college.clubs || 'Data currently unavailable for this institution.'}
+                </p>
+                {college.socialVibe && <span className="inline-block px-2.5 py-1 bg-pink-500/10 border border-pink-500/20 rounded-full text-xs text-pink-300">{college.socialVibe}</span>}
+              </section>
+
+              {/* Athletics */}
+              <section>
+                <h3 className="flex items-center text-lg font-semibold text-white mb-3">
+                  <Trophy className="w-5 h-5 mr-2 text-orange-400" />
+                  Athletics Culture
+                </h3>
+                <p className="text-gray-300 text-sm leading-relaxed mb-3">
+                  {college.athleticsSnippet || 'Data currently unavailable for this institution.'}
+                </p>
+                {college.athleticsVibe && <span className="inline-block px-2.5 py-1 bg-orange-500/10 border border-orange-500/20 rounded-full text-xs text-orange-300">{college.athleticsVibe}</span>}
+              </section>
+
+              {/* Safety */}
+              <section>
+                <h3 className="flex items-center text-lg font-semibold text-white mb-3">
+                  <ShieldCheck className="w-5 h-5 mr-2 text-emerald-400" />
+                  Safety & Surroundings
                 </h3>
                 <p className="text-gray-300 text-sm leading-relaxed">
-                  {college.clubs || 'Data currently unavailable for this institution.'}
+                  {college.safetySnippet || 'Data currently unavailable for this institution.'}
                 </p>
-                
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {college.socialVibe && <span className="px-2.5 py-1 bg-white/10 rounded-full text-xs text-gray-300">{college.socialVibe}</span>}
-                  {college.athleticsVibe && <span className="px-2.5 py-1 bg-white/10 rounded-full text-xs text-gray-300">{college.athleticsVibe}</span>}
-                </div>
               </section>
             </div>
           </div>
