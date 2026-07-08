@@ -1,13 +1,15 @@
 import { MapPin, Users, TrendingUp, DollarSign, X, ExternalLink, BookOpen, Activity, GraduationCap, ShieldCheck, Trophy, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { getEffectiveTuition } from '@/lib/tuition';
 
 interface CollegeModalProps {
   college: any;
+  userStateCode?: string | null;
   onClose: () => void;
 }
 
-export default function CollegeModal({ college, onClose }: CollegeModalProps) {
+export default function CollegeModal({ college, userStateCode, onClose }: CollegeModalProps) {
   if (!college) return null;
 
   return (
@@ -69,13 +71,21 @@ export default function CollegeModal({ college, onClose }: CollegeModalProps) {
           {/* Quick Stats Grid */}
           {(() => {
             const isPrivate = college.tuitionInState && college.tuitionOutOfState && college.tuitionInState === college.tuitionOutOfState;
-            const gridColsClass = isPrivate 
-              ? "grid grid-cols-2 md:grid-cols-5 gap-4 mb-4" 
-              : "grid grid-cols-2 md:grid-cols-6 gap-4 mb-4";
             
+            const tuitionInStateVal = college.tuitionInState !== undefined ? college.tuitionInState : null;
+            const tuitionOutOfStateVal = college.tuitionOutOfState !== undefined ? college.tuitionOutOfState : null;
+
+            const { tuition: displayTuition, rule, originalOutOfState } = getEffectiveTuition({
+              tuitionInState: tuitionInStateVal,
+              tuitionOutOfState: tuitionOutOfStateVal,
+              tuition: college.tuition,
+              location: college.location,
+              reciprocity: college.reciprocity
+            }, userStateCode || null);
+
             return (
               <>
-                <div className={gridColsClass}>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
                   <div className="bg-white/5 border border-white/10 rounded-xl p-4">
                     <p className="text-gray-400 text-xs mb-1">Acceptance Rate</p>
                     <div className="text-xl font-bold text-white">{college.acceptanceRate}%</div>
@@ -106,13 +116,36 @@ export default function CollegeModal({ college, onClose }: CollegeModalProps) {
                         </div>
                         {college.tuitionYear && <span className="text-[10px] text-gray-500">{college.tuitionYear}</span>}
                       </div>
-                      <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                        <p className="text-gray-400 text-xs mb-1">Out-of-State Tuition</p>
-                        <div className="text-xl font-bold text-white">
-                          ${(college.tuitionOutOfState || college.tuition).toLocaleString()}
+
+                      {originalOutOfState ? (
+                        <>
+                          <div className="bg-white/5 border border-white/10 rounded-xl p-4 opacity-50">
+                            <p className="text-gray-400 text-xs mb-1">Out-of-State Tuition</p>
+                            <div className="text-xl font-bold text-white line-through">
+                              ${originalOutOfState.toLocaleString()}
+                            </div>
+                            {college.tuitionYear && <span className="text-[10px] text-gray-500">{college.tuitionYear}</span>}
+                          </div>
+                          
+                          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 shadow-lg shadow-emerald-500/5">
+                            <p className="text-emerald-400 text-xs mb-1 font-semibold">
+                              {rule?.program} Tuition
+                            </p>
+                            <div className="text-xl font-bold text-white">
+                              ${displayTuition.toLocaleString()}
+                            </div>
+                            {college.tuitionYear && <span className="text-[10px] text-emerald-400">{college.tuitionYear}</span>}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                          <p className="text-gray-400 text-xs mb-1">Out-of-State Tuition</p>
+                          <div className="text-xl font-bold text-white">
+                            ${(college.tuitionOutOfState || college.tuition).toLocaleString()}
+                          </div>
+                          {college.tuitionYear && <span className="text-[10px] text-gray-500">{college.tuitionYear}</span>}
                         </div>
-                        {college.tuitionYear && <span className="text-[10px] text-gray-500">{college.tuitionYear}</span>}
-                      </div>
+                      )}
                     </>
                   )}
 
@@ -128,6 +161,36 @@ export default function CollegeModal({ college, onClose }: CollegeModalProps) {
                     </span>
                   </div>
                 </div>
+
+                {rule && (
+                  <div className="flex flex-col gap-1.5 p-4 mb-6 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                      <span className="font-semibold">
+                        {rule.program} Reciprocity Program Rate Applied!
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-300 pl-7 leading-relaxed">
+                      You are seeing a tuition of <strong>${displayTuition.toLocaleString()}/yr</strong> instead of the standard out-of-state rate of <strong>${originalOutOfState?.toLocaleString()}/yr</strong> because you are a resident of <strong>{userStateCode}</strong>.
+                    </p>
+                    {rule.conditions && (
+                      <p className="text-xs text-gray-400 pl-7 mt-1">
+                        <strong>Conditions:</strong> {rule.conditions}
+                      </p>
+                    )}
+                    <div className="text-xs text-gray-400 pl-7 mt-1.5">
+                      <a 
+                        href={rule.sourceUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-emerald-400 hover:text-emerald-300 hover:underline flex items-center gap-1 w-max"
+                      >
+                        Official {rule.program} Portal
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  </div>
+                )}
 
                 {college.tuitionSourceUrl && (
                   <div className="flex justify-end mb-6 text-xs text-gray-500">

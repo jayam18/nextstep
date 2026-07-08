@@ -168,6 +168,7 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
                     tuitionOutOfState={college.tuitionOutOfState}
                     avgNetPrice={college.avgNetPrice}
                     userStateCode={userStateCode}
+                    reciprocity={college.reciprocity}
                     onClick={() => setSelectedCollege(college)}
                   />
                 </motion.div>
@@ -185,6 +186,7 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
         {selectedCollege && (
           <CollegeModal 
             college={selectedCollege} 
+            userStateCode={userStateCode}
             onClose={() => setSelectedCollege(null)} 
           />
         )}

@@ -1,5 +1,6 @@
 import { MapPin, Users, TrendingUp, DollarSign } from 'lucide-react';
 import Image from 'next/image';
+import { getEffectiveTuition } from '@/lib/tuition';
 
 interface CollegeCardProps {
   name: string;
@@ -24,6 +25,8 @@ interface CollegeCardProps {
   tuitionOutOfState?: number | null;
   avgNetPrice?: number | null;
   userStateCode?: string | null;
+  // T2 Reciprocity Props
+  reciprocity?: any[];
 }
 
 export default function CollegeCard({ 
@@ -47,25 +50,30 @@ export default function CollegeCard({
   tuitionInState,
   tuitionOutOfState,
   avgNetPrice,
-  userStateCode
+  userStateCode,
+  reciprocity
 }: CollegeCardProps) {
   const parsedTags = typeof tags === 'string' ? tags.split(',') : tags;
 
-  // Determine state-aware tuition to display
-  let displayTuition = tuition;
-  let tuitionType: 'In-State' | 'Out-of-State' | null = null;
+  // Determine state-aware tuition with reciprocity helper
+  const tuitionInStateVal = tuitionInState !== undefined ? tuitionInState : null;
+  const tuitionOutOfStateVal = tuitionOutOfState !== undefined ? tuitionOutOfState : null;
 
-  if (tuitionInState !== undefined && tuitionInState !== null && tuitionOutOfState !== undefined && tuitionOutOfState !== null) {
-    const isPrivate = tuitionInState === tuitionOutOfState;
-    if (isPrivate) {
-      displayTuition = tuitionInState;
-      tuitionType = null;
-    } else {
-      const locationState = location.split(',').pop()?.trim();
-      const isLocal = userStateCode && locationState === userStateCode;
-      displayTuition = isLocal ? tuitionInState : tuitionOutOfState;
-      tuitionType = isLocal ? 'In-State' : 'Out-of-State';
-    }
+  const { tuition: displayTuition, rule, isLocal, originalOutOfState } = getEffectiveTuition({
+    tuitionInState: tuitionInStateVal,
+    tuitionOutOfState: tuitionOutOfStateVal,
+    tuition,
+    location,
+    reciprocity
+  }, userStateCode || null);
+
+  let tuitionTypeLabel = '';
+  if (isLocal) {
+    tuitionTypeLabel = 'In-State';
+  } else if (rule) {
+    tuitionTypeLabel = `${rule.program} Rate`;
+  } else if (tuitionInStateVal !== null && tuitionOutOfStateVal !== null && tuitionInStateVal !== tuitionOutOfStateVal) {
+    tuitionTypeLabel = 'Out-of-State';
   }
 
   return (
@@ -129,15 +137,20 @@ export default function CollegeCard({
             <div className="flex flex-col">
               <div className="flex items-center text-sm font-semibold text-white">
                 <DollarSign className="w-3.5 h-3.5 mr-0.5 text-blue-400" />
-                {(displayTuition / 1000).toFixed(1)}k
+                <span>{(displayTuition / 1000).toFixed(1)}k</span>
+                {originalOutOfState && (
+                  <span className="line-through text-[11px] text-gray-500 font-normal ml-1.5">
+                    ${(originalOutOfState / 1000).toFixed(0)}k
+                  </span>
+                )}
               </div>
-              {tuitionType && (
+              {tuitionTypeLabel && (
                 <span className={`text-[10px] font-semibold px-2 py-0.5 mt-1 rounded-md inline-block w-max leading-none ${
-                  tuitionType === 'In-State'
+                  tuitionTypeLabel.includes('In-State') || tuitionTypeLabel.includes('MSEP') || tuitionTypeLabel.includes('WUE') || tuitionTypeLabel.includes('ACM') || tuitionTypeLabel.includes('NEBHE')
                     ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                     : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
                 }`}>
-                  {tuitionType}
+                  {tuitionTypeLabel}
                 </span>
               )}
             </div>

@@ -49,6 +49,9 @@ model College {
   avgNetPrice        Int?   // average net price after aid
   tuitionSourceUrl   String?
   tuitionYear        String? // e.g. "2023-24"
+
+  // T2 Reciprocity relation
+  reciprocity        TuitionReciprocity[]
   
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -59,3 +62,17 @@ model CareerPath {
   name     String    @unique
   colleges College[]
 }
+
+model TuitionReciprocity {
+  id            String   @id @default(cuid())
+  collegeId     String
+  program       String   // "MSEP" | "WUE" | "ACM" | "NEBHE" | "institutional" | "none"
+  eligibleStates String  // comma-separated: "IL,MO,WI" (or "*" for any out-of-state)
+  rateType      String   // "pct-of-instate" | "flat" | "instate-rate" | "none"
+  rateValue     Int?     // 150 (for pct), or dollar amount (for flat)
+  conditions    String?  // "majors not offered in home state", "min 3.0 GPA", "limited slots"
+  sourceUrl     String   // REQUIRED
+  retrievedAt   DateTime @default(now())
+  college       College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+}
+
