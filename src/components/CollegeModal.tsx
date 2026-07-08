@@ -67,24 +67,84 @@ export default function CollegeModal({ college, onClose }: CollegeModalProps) {
         <div className="p-6 overflow-y-auto custom-scrollbar">
           
           {/* Quick Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <p className="text-gray-400 text-xs mb-1">Acceptance Rate</p>
-              <div className="text-xl font-bold text-white">{college.acceptanceRate}%</div>
-            </div>
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <p className="text-gray-400 text-xs mb-1">Undergraduates</p>
-              <div className="text-xl font-bold text-white">{college.students.toLocaleString()}</div>
-            </div>
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <p className="text-gray-400 text-xs mb-1">Net Price</p>
-              <div className="text-xl font-bold text-white">${college.tuition.toLocaleString()}</div>
-            </div>
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <p className="text-gray-400 text-xs mb-1">Avg GPA (Est.)</p>
-              <div className="text-xl font-bold text-white">{college.avgGpa || 'N/A'}</div>
-            </div>
-          </div>
+          {(() => {
+            const isPrivate = college.tuitionInState && college.tuitionOutOfState && college.tuitionInState === college.tuitionOutOfState;
+            const gridColsClass = isPrivate 
+              ? "grid grid-cols-2 md:grid-cols-5 gap-4 mb-4" 
+              : "grid grid-cols-2 md:grid-cols-6 gap-4 mb-4";
+            
+            return (
+              <>
+                <div className={gridColsClass}>
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                    <p className="text-gray-400 text-xs mb-1">Acceptance Rate</p>
+                    <div className="text-xl font-bold text-white">{college.acceptanceRate}%</div>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                    <p className="text-gray-400 text-xs mb-1">Undergraduates</p>
+                    <div className="text-xl font-bold text-white">{college.students.toLocaleString()}</div>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                    <p className="text-gray-400 text-xs mb-1">Avg GPA (Est.)</p>
+                    <div className="text-xl font-bold text-white">{college.avgGpa || 'N/A'}</div>
+                  </div>
+
+                  {isPrivate ? (
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                      <p className="text-gray-400 text-xs mb-1">Tuition</p>
+                      <div className="text-xl font-bold text-white">
+                        ${(college.tuitionInState || college.tuition).toLocaleString()}
+                      </div>
+                      {college.tuitionYear && <span className="text-[10px] text-gray-500">{college.tuitionYear}</span>}
+                    </div>
+                  ) : (
+                    <>
+                      <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                        <p className="text-gray-400 text-xs mb-1">In-State Tuition</p>
+                        <div className="text-xl font-bold text-white">
+                          ${(college.tuitionInState || college.tuition).toLocaleString()}
+                        </div>
+                        {college.tuitionYear && <span className="text-[10px] text-gray-500">{college.tuitionYear}</span>}
+                      </div>
+                      <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                        <p className="text-gray-400 text-xs mb-1">Out-of-State Tuition</p>
+                        <div className="text-xl font-bold text-white">
+                          ${(college.tuitionOutOfState || college.tuition).toLocaleString()}
+                        </div>
+                        {college.tuitionYear && <span className="text-[10px] text-gray-500">{college.tuitionYear}</span>}
+                      </div>
+                    </>
+                  )}
+
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col justify-between">
+                    <div>
+                      <p className="text-gray-400 text-xs mb-1">Avg Net Price</p>
+                      <div className="text-xl font-bold text-white">
+                        ${(college.avgNetPrice || college.tuition).toLocaleString()}
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-gray-500 mt-1 leading-tight">
+                      What families actually pay after aid, on average.
+                    </span>
+                  </div>
+                </div>
+
+                {college.tuitionSourceUrl && (
+                  <div className="flex justify-end mb-6 text-xs text-gray-500">
+                    <a 
+                      href={college.tuitionSourceUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="hover:text-blue-400 transition-colors flex items-center gap-1"
+                    >
+                      Data Source: College Scorecard ({college.tuitionYear || '2023-24'})
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                )}
+              </>
+            );
+          })()}
 
           <div className="grid md:grid-cols-2 gap-8">
             {/* Left Column */}

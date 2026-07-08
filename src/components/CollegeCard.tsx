@@ -19,6 +19,11 @@ interface CollegeCardProps {
   campusIdentity?: string;
   logoUrl?: string;
   onClick?: () => void;
+  // T1 Tuition Props
+  tuitionInState?: number | null;
+  tuitionOutOfState?: number | null;
+  avgNetPrice?: number | null;
+  userStateCode?: string | null;
 }
 
 export default function CollegeCard({ 
@@ -38,9 +43,31 @@ export default function CollegeCard({
   academicVibe,
   campusIdentity,
   logoUrl,
-  onClick
+  onClick,
+  tuitionInState,
+  tuitionOutOfState,
+  avgNetPrice,
+  userStateCode
 }: CollegeCardProps) {
   const parsedTags = typeof tags === 'string' ? tags.split(',') : tags;
+
+  // Determine state-aware tuition to display
+  let displayTuition = tuition;
+  let tuitionType: 'In-State' | 'Out-of-State' | null = null;
+
+  if (tuitionInState !== undefined && tuitionInState !== null && tuitionOutOfState !== undefined && tuitionOutOfState !== null) {
+    const isPrivate = tuitionInState === tuitionOutOfState;
+    if (isPrivate) {
+      displayTuition = tuitionInState;
+      tuitionType = null;
+    } else {
+      const locationState = location.split(',').pop()?.trim();
+      const isLocal = userStateCode && locationState === userStateCode;
+      displayTuition = isLocal ? tuitionInState : tuitionOutOfState;
+      tuitionType = isLocal ? 'In-State' : 'Out-of-State';
+    }
+  }
+
   return (
     <div 
       onClick={onClick}
@@ -98,10 +125,21 @@ export default function CollegeCard({
             </div>
           </div>
           <div>
-            <p className="text-xs text-gray-400 mb-1">Net Price</p>
-            <div className="flex items-center text-sm font-semibold text-white">
-              <DollarSign className="w-3.5 h-3.5 mr-0.5 text-blue-400" />
-              {(tuition / 1000).toFixed(1)}k
+            <p className="text-xs text-gray-400 mb-1">Tuition</p>
+            <div className="flex flex-col">
+              <div className="flex items-center text-sm font-semibold text-white">
+                <DollarSign className="w-3.5 h-3.5 mr-0.5 text-blue-400" />
+                {(displayTuition / 1000).toFixed(1)}k
+              </div>
+              {tuitionType && (
+                <span className={`text-[10px] font-semibold px-2 py-0.5 mt-1 rounded-md inline-block w-max leading-none ${
+                  tuitionType === 'In-State'
+                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                    : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                }`}>
+                  {tuitionType}
+                </span>
+              )}
             </div>
           </div>
           <div>

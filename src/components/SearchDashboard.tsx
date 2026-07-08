@@ -164,6 +164,10 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
                     academicVibe={college.academicVibe}
                     campusIdentity={college.campusIdentity}
                     logoUrl={college.logoUrl}
+                    tuitionInState={college.tuitionInState}
+                    tuitionOutOfState={college.tuitionOutOfState}
+                    avgNetPrice={college.avgNetPrice}
+                    userStateCode={userStateCode}
                     onClick={() => setSelectedCollege(college)}
                   />
                 </motion.div>
