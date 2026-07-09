@@ -50,8 +50,27 @@ model College {
   tuitionSourceUrl   String?
   tuitionYear        String? // e.g. "2023-24"
 
+  // D1 Scorecard fields
+  ipedsUnitId        Int?
+  completionRate     Float?   // graduation rate within 150% normal time (6 years)
+  medianEarnings     Int?     // median earnings 10 years after entry
+  
+  // G1 Net price by income level (overall title IV recipients)
+  netPrice0_30k      Int?     // net price for income $0-$30,000
+  netPrice30_48k     Int?     // net price for income $30,001-$48,000
+  netPrice48_75k     Int?     // net price for income $48,001-$75,000
+  netPrice75_110k    Int?     // net price for income $75,001-$110,000
+  netPrice110kPlus   Int?     // net price for income $110,001+
+
+  // Data Provenance
+  scorecardDataSource String?
+  scorecardRetrievedAt DateTime?
+
   // T2 Reciprocity relation
   reciprocity        TuitionReciprocity[]
+
+  // S1 Special programs & constituent colleges
+  programs           CollegeProgram[]
   
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -61,6 +80,18 @@ model CareerPath {
   id       String    @id @default(cuid())
   name     String    @unique
   colleges College[]
+}
+
+model CollegeProgram {
+  id          String  @id @default(cuid())
+  collegeId   String
+  name        String  // "Grainger College of Engineering"
+  type        String  // constituent-school | honors-college | co-op | research | accelerated | study-abroad | other
+  prominence  Int     // 1 = flagship jewel, 2 = notable, 3 = solid
+  description String  // 1-2 sentences on why it matters
+  knownFor    String? // comma-separated: "CS, ECE, Aerospace"
+  sourceUrl   String?
+  college     College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
 }
 
 model TuitionReciprocity {

@@ -9,6 +9,16 @@ interface CollegeModalProps {
   onClose: () => void;
 }
 
+const PROGRAM_TYPE_LABELS: Record<string, string> = {
+  'constituent-school': 'School',
+  'honors-college': 'Honors',
+  'co-op': 'Co-op',
+  'research': 'Research',
+  'accelerated': 'Accelerated',
+  'study-abroad': 'Study Abroad',
+  'other': 'Signature',
+};
+
 export default function CollegeModal({ college, userStateCode, onClose }: CollegeModalProps) {
   if (!college) return null;
 
@@ -241,9 +251,59 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
                   <BookOpen className="w-5 h-5 mr-2 text-purple-400" />
                   Special Programs
                 </h3>
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  {college.specialPrograms || 'Data currently unavailable for this institution.'}
-                </p>
+                {college.programs?.length ? (
+                  <div className="space-y-3">
+                    {college.programs
+                      .filter((p: any) => p.prominence === 1)
+                      .map((p: any) => (
+                        <div key={p.id} className="rounded-xl p-4 bg-gradient-to-br from-purple-500/15 to-blue-500/10 border border-purple-500/30">
+                          <p className="text-[10px] uppercase tracking-wider text-purple-300 font-semibold mb-1">
+                            🏛 Jewel of the university
+                          </p>
+                          <div className="flex items-start justify-between gap-2">
+                            <h4 className="text-sm font-semibold text-white">{p.name}</h4>
+                            {p.sourceUrl && (
+                              <a href={p.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-purple-300 transition-colors flex-shrink-0" aria-label={`${p.name} source`}>
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-300 leading-relaxed mt-1">{p.description}</p>
+                          {p.knownFor && (
+                            <div className="flex flex-wrap gap-1.5 mt-2">
+                              {p.knownFor.split(',').map((field: string, i: number) => (
+                                <span key={i} className="px-2 py-0.5 bg-purple-500/10 border border-purple-500/20 rounded-full text-[11px] text-purple-300">
+                                  {field.trim()}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    <ul className="space-y-2">
+                      {college.programs
+                        .filter((p: any) => p.prominence > 1)
+                        .map((p: any) => (
+                          <li key={p.id} className="bg-white/5 border border-white/5 rounded-lg p-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="text-sm font-medium text-gray-200">{p.name}</span>
+                              <span className="text-[10px] text-gray-400 bg-gray-800 px-2 py-0.5 rounded whitespace-nowrap flex-shrink-0">
+                                {PROGRAM_TYPE_LABELS[p.type] || 'Program'}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-400 leading-relaxed mt-1">{p.description}</p>
+                            {p.knownFor && (
+                              <p className="text-[11px] text-purple-300/80 mt-1">{p.knownFor}</p>
+                            )}
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <p className="text-gray-300 text-sm leading-relaxed">
+                    {college.specialPrograms || 'Data currently unavailable for this institution.'}
+                  </p>
+                )}
               </section>
             </div>
 

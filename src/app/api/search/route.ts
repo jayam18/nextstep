@@ -26,8 +26,14 @@ export async function GET(request: Request) {
           const inAcadVibe = college.academicVibe?.toLowerCase().includes(term);
           const inIdenVibe = college.campusIdentity?.toLowerCase().includes(term);
           const inCareer = college.careerPaths?.some((p: any) => p.name.toLowerCase().includes(term));
+          // S1: match constituent schools & signature programs ("Wharton", "Grainger", "co-op")
+          const inPrograms = college.programs?.some((p: any) =>
+            p.name.toLowerCase().includes(term) ||
+            p.knownFor?.toLowerCase().includes(term) ||
+            p.type.toLowerCase().includes(term)
+          );
 
-          return inName || inLocation || inTags || inLocVibe || inSocVibe || inAthVibe || inAcadVibe || inIdenVibe || inCareer;
+          return inName || inLocation || inTags || inLocVibe || inSocVibe || inAthVibe || inAcadVibe || inIdenVibe || inCareer || inPrograms;
         });
       });
 
