@@ -62,3 +62,34 @@ To enable feedback persistence, configure the following environment variables in
 *   `GET /api/feedback`: Retrieves all feedback records (newest first). Requires the header:
     `Authorization: Bearer <ADMIN_TOKEN>`
 
+## College Scorecard Refresh (Epic D1)
+
+This project contains a database structure and utility scripts for linking and updating college data with official federal metrics from the College Scorecard API.
+
+### Database Updates
+The `College` schema supports the following Scorecard metrics:
+*   `ipedsUnitId`: Federal IPEDS ID (join key).
+*   `completionRate`: Overall 150% normal-time graduation rate.
+*   `medianEarnings`: Median earnings 10 years after entry.
+*   `netPrice0_30k`, `netPrice30_48k`, `netPrice48_75k`, `netPrice75_110k`, `netPrice110kPlus`: Net price averages by household income bracket.
+
+### Refresh Scripts
+
+1.  **Configure API Key**: Ensure `.env` contains `COLLEGE_SCORECARD_API_KEY` with a valid Data.gov key.
+2.  **IPEDS Linking**: Match existing database records to IPEDS UnitIDs:
+    ```bash
+    npx tsx scripts/link-ipeds-ids.ts
+    ```
+3.  **Dry-run Refresh**: Preview the scorecard API diff without updating the database:
+    ```bash
+    npx tsx scripts/refresh-scorecard.ts --dry-run
+    ```
+4.  **Execute Refresh**: Query the Scorecard API in optimized batches of 100 and update the local database:
+    ```bash
+    npx tsx scripts/refresh-scorecard.ts
+    ```
+5.  **Export to JSON**: Commit local SQLite updates to the static JSON payload (`src/data/colleges.json`):
+    ```bash
+    npx tsx scripts/export-db-to-json.ts
+    ```
+
