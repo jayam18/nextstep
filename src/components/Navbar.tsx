@@ -21,12 +21,14 @@ export default function Navbar() {
               </span>
             </div>
             
+            {/* Fit Quiz temporarily disabled — re-enable by restoring this block
             <div className="hidden md:flex items-center space-x-8">
               <Link href="/quiz" className="text-sm font-medium text-gray-300 hover:text-white transition-colors flex items-center gap-2">
                 <Search className="w-4 h-4" />
                 Fit Quiz
               </Link>
             </div>
+            */}
 
             <div className="flex items-center gap-4">
               <button 

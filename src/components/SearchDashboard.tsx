@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, SlidersHorizontal, Sparkles, Loader2, ChevronDown } from 'lucide-react';
+import { Search, SlidersHorizontal, Loader2, ChevronDown } from 'lucide-react';
 import CollegeCard from './CollegeCard';
 import CollegeModal from './CollegeModal';
 
@@ -85,17 +85,12 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
         <div className="absolute top-40 left-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[120px] -z-10" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium mb-2">
-            <Sparkles className="w-3 h-3" />
-            <span>AI-Powered (in future) College Matching</span>
-          </div>
-          
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-2">
             Find the college that <span className="text-gradient">fits your vibe.</span>
           </h1>
           
           <p className="text-sm md:text-base text-gray-400 mb-4 max-w-2xl mx-auto hidden sm:block">
-            Search by major, location, or vibe. We analyze millions of data points to find where you truly belong.
+            Search by major, location, or vibe. Real tuition, real aid, and real graduate earnings for 300 colleges — sourced straight from federal data.
           </p>
 
           <div className="max-w-3xl mx-auto relative group">
