@@ -58,4 +58,74 @@
   .glow {
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
   }
+
 }
+
+/* "Counselor's desk" card physics: hand-placed tilt + paper shadow + levitate.
+   Tilt values are set per grid slot on the wrapper (framer-motion owns the
+   wrapper's transform, so the card consumes them one level down). */
+.desk-grid {
+  perspective: 1200px;
+}
+.desk-grid > *:nth-child(3n-2) { --tilt: 0.5deg;  --shift: 0px; }
+.desk-grid > *:nth-child(3n-1) { --tilt: -0.5deg; --shift: 7px; }
+.desk-grid > *:nth-child(3n)   { --tilt: -0.6deg; --shift: -5px; }
+
+.desk-card {
+  position: relative;
+  transform: translateX(var(--shift, 0px)) rotate(var(--tilt, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+.desk-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0.55);
+  filter: blur(14px);
+  transform: translate3d(10px, 8px, -1px) rotate(1deg);
+  z-index: -1;
+  opacity: 0.8;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.desk-card:hover {
+  transform: translateX(var(--shift, 0px)) translateY(-6px) rotate(0deg)
+    rotateX(6deg) rotateY(-3deg) translateZ(2rem);
+}
+.desk-card:hover::before {
+  transform: translate3d(18px, 22px, -1px) rotate(1deg);
+  opacity: 0.5;
+}
+
+/* Glossy tape strip — used once per college, on the aid pledge note */
+.tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 96px;
+  height: 20px;
+  transform: translateX(-50%) rotate(-3deg);
+  background: rgba(253, 230, 138, 0.85);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+    0 2px 4px rgba(0, 0, 0, 0.35);
+  border-radius: 1px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.desk-card,
+.desk-card::before {
+    transition: none;
+  }
+.desk-card:hover {
+    transform: translateX(var(--shift, 0px)) rotate(var(--tilt, 0deg));
+  }
+.desk-card:hover::before {
+    transform: translate3d(10px, 8px, -1px) rotate(1deg);
+    opacity: 0.8;
+  }
+}
+

@@ -79,9 +79,9 @@ export default function CollegeCard({
   return (
     <div 
       onClick={onClick}
-      className="glass-card rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:glow group cursor-pointer"
+      className="desk-card glass-card rounded-2xl group cursor-pointer"
     >
-      <div className="relative h-48 w-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center p-6">
+      <div className="relative h-48 w-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center p-6 rounded-t-2xl overflow-hidden">
         {/* Background removed as requested, using logo instead */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#18181b] to-transparent opacity-90" />
         

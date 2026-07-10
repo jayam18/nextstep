@@ -340,7 +340,8 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
                             <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mt-3 mb-1.5">{label}</p>
                             <ul className="space-y-2">
                               {entries.map((a: any) => (
-                                <li key={a.id} className={`rounded-lg p-3 border ${highlight ? 'bg-emerald-500/10 border-emerald-500/25' : 'bg-white/5 border-white/5'}`}>
+                                <li key={a.id} className={`rounded-lg p-3 border ${highlight ? 'relative mt-2 rotate-[-0.5deg] bg-emerald-500/10 border-emerald-500/25 shadow-[6px_6px_14px_rgba(0,0,0,0.45)]' : 'bg-white/5 border-white/5'}`}>
+                                  {highlight && <span className="tape" aria-hidden="true" />}
                                   <div className="flex items-start justify-between gap-2">
                                     <span className={`text-sm font-medium ${highlight ? 'text-emerald-200' : 'text-gray-200'}`}>{a.name}</span>
                                     <a href={a.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-emerald-300 transition-colors flex-shrink-0" aria-label={`${a.name} source: ${a.sourceName}`}>

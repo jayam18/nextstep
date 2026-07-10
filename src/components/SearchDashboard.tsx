@@ -141,7 +141,7 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
             <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
           </div>
         ) : results.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="desk-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <AnimatePresence>
               {results.slice(0, 15).map((college, idx) => (
                 <motion.div
