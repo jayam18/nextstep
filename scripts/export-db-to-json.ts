@@ -17,7 +17,8 @@ async function main() {
       majors: {
         orderBy: { degreesAwarded: 'desc' },
         include: { rankings: true }
-      }
+      },
+      aid: true
     },
     orderBy: {
       ranking: 'asc'

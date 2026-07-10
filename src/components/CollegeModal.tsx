@@ -305,6 +305,71 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
                   </p>
                 )}
               </section>
+
+              {/* Paying for It (G1) */}
+              <section>
+                <h3 className="flex items-center text-lg font-semibold text-white mb-1">
+                  <DollarSign className="w-5 h-5 mr-2 text-emerald-400" />
+                  Paying for It
+                </h3>
+                {college.netPrice48_75k != null && (
+                  <p className="text-[11px] text-gray-500 mb-3">
+                    Families earning $48k–$75k typically pay ~${college.netPrice48_75k.toLocaleString()}/yr here after aid.
+                  </p>
+                )}
+                {college.aid?.length ? (
+                  <div className="space-y-2">
+                    {(() => {
+                      const awardText = (a: any) => {
+                        if (a.typicalAwardMin != null && a.typicalAwardMax != null) return `$${a.typicalAwardMin.toLocaleString()}–$${a.typicalAwardMax.toLocaleString()}/yr`;
+                        if (a.typicalAwardMax != null) return `up to $${a.typicalAwardMax.toLocaleString()}/yr`;
+                        if (a.typicalAwardMin != null) return `at least $${a.typicalAwardMin.toLocaleString()}/yr`;
+                        return null;
+                      };
+                      const groups: [string, string, (a: any) => boolean][] = [
+                        ['This college\'s aid pledge', 'institutional', (a) => a.kind === 'institutional'],
+                        ['State grants & scholarships', 'state', (a) => a.kind === 'state' || a.kind === 'merit'],
+                        ['Federal aid (all colleges)', 'federal', (a) => a.kind === 'federal'],
+                      ];
+                      return groups.map(([label, key, match]) => {
+                        const entries = college.aid.filter(match);
+                        if (!entries.length) return null;
+                        const highlight = key === 'institutional';
+                        return (
+                          <div key={key}>
+                            <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mt-3 mb-1.5">{label}</p>
+                            <ul className="space-y-2">
+                              {entries.map((a: any) => (
+                                <li key={a.id} className={`rounded-lg p-3 border ${highlight ? 'bg-emerald-500/10 border-emerald-500/25' : 'bg-white/5 border-white/5'}`}>
+                                  <div className="flex items-start justify-between gap-2">
+                                    <span className={`text-sm font-medium ${highlight ? 'text-emerald-200' : 'text-gray-200'}`}>{a.name}</span>
+                                    <a href={a.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-emerald-300 transition-colors flex-shrink-0" aria-label={`${a.name} source: ${a.sourceName}`}>
+                                      <ExternalLink className="w-3.5 h-3.5" />
+                                    </a>
+                                  </div>
+                                  {(awardText(a) || a.awardNote) && (
+                                    <p className={`text-xs mt-1 ${highlight ? 'text-emerald-300' : 'text-gray-300'}`}>
+                                      {[awardText(a), a.awardNote].filter(Boolean).join(' — ')}
+                                    </p>
+                                  )}
+                                  {a.eligibility && <p className="text-[11px] text-gray-500 mt-1">{a.eligibility}</p>}
+                                  {a.howToApply && (
+                                    <span className="inline-block mt-1.5 px-2 py-0.5 bg-white/5 border border-white/10 rounded-full text-[10px] text-gray-400">
+                                      Apply: {a.howToApply}
+                                    </span>
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+                ) : (
+                  <p className="text-gray-400 text-sm">Aid data for this college is still being researched.</p>
+                )}
+              </section>
             </div>
 
             {/* Right Column */}
@@ -320,8 +385,8 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
                     <p className="text-[11px] text-gray-500 mb-3">
                       Hover over a major to see typical earnings and loan debt.
                     </p>
-                    <ul className="space-y-2">
-                      {college.majors.slice(0, 5).map((m: any) => {
+                    {(() => {
+                      const renderMajor = (m: any) => {
                         const vsNational = m.medianEarnings4yr && m.medianEarnings4yrNational
                           ? m.medianEarnings4yr - m.medianEarnings4yrNational
                           : null;
@@ -381,8 +446,24 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
                             </div>
                           </li>
                         );
-                      })}
-                    </ul>
+                      };
+                      const topFive = college.majors.slice(0, 5);
+                      const rankedExtras = college.majors.slice(5).filter((m: any) => m.rankings?.length);
+                      return (
+                        <>
+                          <ul className="space-y-2">{topFive.map(renderMajor)}</ul>
+                          {rankedExtras.length > 0 && (
+                            <>
+                              <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-amber-300/90 font-semibold mt-4 mb-2">
+                                <Trophy className="w-3 h-3" />
+                                Also nationally ranked
+                              </p>
+                              <ul className="space-y-2">{rankedExtras.map(renderMajor)}</ul>
+                            </>
+                          )}
+                        </>
+                      );
+                    })()}
                     <a
                       href={college.majors[0].sourceUrl}
                       target="_blank"

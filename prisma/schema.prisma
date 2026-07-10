@@ -75,6 +75,9 @@ model College {
 
   // M1 Majors with outcomes
   majors             CollegeMajor[]
+
+  // G1 Grants & scholarships
+  aid                CollegeAid[]
   
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -96,6 +99,22 @@ model CollegeProgram {
   knownFor    String? // comma-separated: "CS, ECE, Aerospace"
   sourceUrl   String?
   college     College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+}
+
+model CollegeAid {
+  id              String   @id @default(cuid())
+  collegeId       String
+  name            String   // "Pell Grant", "Illinois MAP Grant", "Illinois Commitment"
+  kind            String   // need-based | merit | federal | state | institutional | departmental
+  typicalAwardMin Int?
+  typicalAwardMax Int?
+  awardNote       String?  // "full tuition", "renewable 4 yrs if GPA ≥ 3.0"
+  eligibility     String?  // one-liner: income threshold, GPA/test floor, major, residency
+  howToApply      String?  // "automatic with application" | "separate app, due Dec 1" | "FAFSA"
+  sourceUrl       String   // REQUIRED — no source, no row
+  sourceName      String   // "Federal Student Aid", "Illinois Student Assistance Commission"
+  retrievedAt     DateTime @default(now())
+  college         College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
 }
 
 model CollegeMajor {
