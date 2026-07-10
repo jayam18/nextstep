@@ -13,6 +13,10 @@ async function main() {
       reciprocity: true,
       programs: {
         orderBy: { prominence: 'asc' }
+      },
+      majors: {
+        orderBy: { degreesAwarded: 'desc' },
+        include: { rankings: true }
       }
     },
     orderBy: {

@@ -309,13 +309,91 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
 
             {/* Right Column */}
             <div className="space-y-8">
-              {/* Top Majors */}
+              {/* Majors & Outcomes */}
               <section>
-                <h3 className="flex items-center text-lg font-semibold text-white mb-4">
+                <h3 className="flex items-center text-lg font-semibold text-white mb-1">
                   <GraduationCap className="w-5 h-5 mr-2 text-green-400" />
-                  Top 5 Most Popular Majors
+                  Top Majors
                 </h3>
-                {college.topMajors ? (
+                {college.majors?.length ? (
+                  <>
+                    <p className="text-[11px] text-gray-500 mb-3">
+                      Hover over a major to see typical earnings and loan debt.
+                    </p>
+                    <ul className="space-y-2">
+                      {college.majors.slice(0, 5).map((m: any) => {
+                        const vsNational = m.medianEarnings4yr && m.medianEarnings4yrNational
+                          ? m.medianEarnings4yr - m.medianEarnings4yrNational
+                          : null;
+                        const topQuartile = m.medianEarnings4yr && m.nationalP75 && m.medianEarnings4yr >= m.nationalP75;
+                        const aboveMedian = vsNational != null && vsNational >= 0;
+                        const ranking = m.rankings?.[0];
+                        return (
+                          <li key={m.id} className="group bg-white/5 rounded-lg p-3 border border-white/5 hover:border-green-500/20 transition-colors">
+                            <div className="flex justify-between items-start gap-2">
+                              <span className="text-sm font-medium text-gray-200">{m.name}</span>
+                              {m.degreeShare != null && (
+                                <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded whitespace-nowrap flex-shrink-0">
+                                  {m.degreeShare}% of degrees
+                                </span>
+                              )}
+                            </div>
+                            {(ranking || topQuartile || aboveMedian) && (
+                              <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                                {ranking && (
+                                  <a href={ranking.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-500/10 border border-amber-500/25 rounded-full text-[11px] text-amber-300 hover:bg-amber-500/20 transition-colors">
+                                    <Trophy className="w-3 h-3" />
+                                    {ranking.rank ? `#${ranking.rank}` : ''} {ranking.source} ({ranking.year})
+                                  </a>
+                                )}
+                                {topQuartile ? (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded-full text-[11px] text-emerald-300">
+                                    <TrendingUp className="w-3 h-3" />
+                                    Top 25% nationally · grad earnings
+                                  </span>
+                                ) : aboveMedian ? (
+                                  <span className="px-2 py-0.5 bg-emerald-500/5 border border-emerald-500/15 rounded-full text-[11px] text-emerald-300/80">
+                                    Above national median · grad earnings
+                                  </span>
+                                ) : null}
+                              </div>
+                            )}
+                            <div className="hidden group-hover:block mt-2">
+                              {m.medianEarnings4yr ? (
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  <span className="px-2 py-0.5 bg-green-500/10 border border-green-500/20 rounded-full text-[11px] text-green-300">
+                                    Median ${Math.round(m.medianEarnings4yr / 1000)}k · 4 yrs after grad
+                                  </span>
+                                  {vsNational != null && (
+                                    <span className={`px-2 py-0.5 rounded-full text-[11px] border ${vsNational >= 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' : 'bg-white/5 border-white/10 text-gray-400'}`}>
+                                      {vsNational >= 0 ? '+' : '−'}${Math.round(Math.abs(vsNational) / 1000)}k vs national median
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <p className="text-[11px] text-gray-500">Earnings not reported for this program (cohort too small).</p>
+                              )}
+                              {m.medianDebt != null && (
+                                <p className="text-[11px] text-gray-500 mt-1.5">
+                                  Median federal loan debt at graduation: ${m.medianDebt.toLocaleString()}
+                                </p>
+                              )}
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <a
+                      href={college.majors[0].sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 justify-end mt-2 text-[11px] text-gray-500 hover:text-blue-400 transition-colors"
+                    >
+                      Earnings & debt: College Scorecard field-of-study data
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </>
+                ) : college.topMajors ? (
                   <ul className="space-y-2">
                     {college.topMajors.split(', ').map((major: string, i: number) => {
                       const [name, pct] = major.split(' (');

@@ -34,6 +34,7 @@ Suggested dispatch order: **F1 → A1 → D1 → T1 → T2 → (G1, S1 in parall
 | D1 | Authoritative data source integration (College Scorecard) | P1 | Data infra | — |
 | G1 | Grants & scholarships catalog (with sources) | P2 | Feature + research | D1 |
 | S1 | Special programs & constituent-college prominence | P2 | Feature + research | — |
+| M1 | Major-level insight: outcomes & program rankings per major | P2 | Feature + data + research | D1 |
 | R1 | Parent/student review ingestion pipeline | P2 | Data infra | DB1 |
 | A3 | Analytics insights dashboard ("what are users looking for") | P3 | Feature | A2 |
 | DB1 | Production database (tech debt, unblocks F1/R1 at scale) | P1 | Infra | — |
@@ -243,6 +244,80 @@ model CollegeProgram {
 **UI:** redesign the Special Programs section of `CollegeModal.tsx`: prominence-1 entries get a highlighted "🏛 Jewel of the university" card with `knownFor` chips; others listed compactly by type. Make program names searchable — add them to the search index in `src/app/api/search/route.ts` so "Grainger" or "co-op" finds the right colleges.
 
 **Acceptance criteria:** every college has ≥1 program entry; the ~50 large universities each identify their flagship school(s); "Wharton", "Grainger", "co-op" as search terms return the right colleges.
+
+---
+
+## M1 — Major-level insight: outcomes & program rankings per major
+
+**Status (July 2026):** Layers 1–2 implemented for all 289 colleges with usable IPEDS IDs — `CollegeMajor` model, `scripts/refresh-majors.ts` (top 10 bachelor's majors by degrees awarded, with 1/4-yr median earnings, national median/p25/p75 for the same CIP, and federal loan debt; 92% of majors have 4-yr earnings), "Top Majors & What Graduates Earn" modal section with vs-national chips and suppression fallback, and major-name search. The national baseline turned out to ship inside the field-of-study payload (`overall_median_earnings_national`) — no separate sweep needed. Remaining: layer 3 (published program rankings — `MajorRanking` table and UI badge support are built and empty, pending the US News licensing check and open-rankings seeding). UI update: dollar figures (earnings/debt) are hover-only; the always-visible signal is a computed national-standing badge per major ("Top 25% nationally · grad earnings" when the program's 4-yr median ≥ the national p75 for the same CIP) — owned data, no licensing. College `aliases` field added for nickname search (Caltech, UIUC, WashU…), seeded via `scripts/populate-aliases.ts`.
+
+**Goal:** Replace the generic "Top 5 Most Popular Majors" list (currently just degree-share percentages, e.g. "Engineering (21.6%)") with targeted, decision-grade insight per major: what graduates of *this major at this college* actually earn and owe, and how the *program* ranks nationally — which is often very different from the school's overall ranking (e.g., a #37 school with a #5 CS program, or a #10 school with a middling nursing program). This is the question families actually ask: "is it good *for what my kid wants to study*?"
+
+**Why the current section is weak:** `topMajors` comes from Scorecard `latest.academics.program_percentage` — 2-digit CIP *family* shares. It says what's popular, not what's good, uses vague labels ("Social Sciences"), and carries no outcome or quality signal. Popularity ≠ strength: a college's best-ranked program is frequently *not* in its top-5 by enrollment.
+
+**Three layers of enhancement (in value order):**
+
+1. **Outcomes by major (authoritative, free, automatable — do first).** The same College Scorecard API used in D1 has a *field-of-study* dataset: per institution × 4-digit CIP × credential, it reports median earnings 1 and 4 years after completion, median debt at graduation, monthly payment, and completer counts. Accessible in the existing API via the nested `latest.programs.cip_4_digit` object (`&all_programs_nested=true`). This turns "7.8% study Computer Science" into "CS grads here: median $X at 4 years, median debt $Y" — per college, sourced, refreshable by extending `scripts/refresh-scorecard.ts`.
+2. **National context per major.** Pair each major's earnings with a national baseline for that CIP (computed across all institutions in the field-of-study file, or from BLS/Census ACS data) so we can render "vs $Z national median" — an honest, non-licensed "ranking substitute" we can compute ourselves (e.g., percentile of this program's earnings among all programs in the same CIP).
+3. **Program rankings & quality markers (research + licensing care).**
+   - **US News undergraduate program rankings** now cover CS, engineering (+ specialties), business (+ specialties), nursing, psychology, economics, data science, etc. These capture exactly the "school #37 / major #5" gap. **Licensed content** — per the appendix policy, store the placement as a cited fact ("#5 Undergraduate CS — U.S. News 2026") with attribution + link, never reproduce lists; flag for a licensing sanity check before launch.
+   - **Open alternatives:** CSRankings (csrankings.org, publication-based, open methodology) for CS; Brown's CS Open Rankings meta-ranking; discipline societies' recognitions.
+   - **Accreditation as a verifiable quality floor:** ABET (engineering/CS), AACSB (business), CCNE/ACEN (nursing), NAAB (architecture) — free, authoritative, binary, and parents understand "accredited".
+   - Cross-link S1: a prominence-1 constituent school (Grainger, Wharton) usually implies its majors are the ranked ones — `CollegeProgram.knownFor` and `CollegeMajor` should reference each other.
+
+**Data model:**
+```prisma
+model CollegeMajor {
+  id                 String  @id @default(cuid())
+  collegeId          String
+  cipCode            String   // 4-digit CIP, e.g. "11.07"
+  name               String   // human label: "Computer Science"
+  credential         String   // "bachelors"
+  degreeShare        Float?   // % of degrees awarded (existing program_percentage)
+  completerCount     Int?     // from field-of-study data
+  medianEarnings1yr  Int?
+  medianEarnings4yr  Int?
+  medianDebt         Int?
+  nationalMedianEarnings Int? // baseline for same CIP across all institutions
+  earningsPercentile Int?     // this program vs all programs in same CIP
+  sourceUrl          String
+  retrievedAt        DateTime
+  rankings           MajorRanking[]
+  college            College @relation(...)
+}
+
+model MajorRanking {
+  id             String  @id @default(cuid())
+  collegeMajorId String
+  source         String   // "US News Undergrad CS" | "CSRankings" | "ABET accredited"
+  year           String   // "2026"
+  rank           Int?     // null for binary markers like accreditation
+  scope          String?  // "national", "public universities", specialty name
+  sourceUrl      String   // REQUIRED
+  retrievedAt    DateTime
+  major          CollegeMajor @relation(...)
+}
+```
+
+**UI (CollegeModal "Top 5 Most Popular Majors" → "Majors & Outcomes"):**
+- Keep top-5-by-share rows but enrich each: median earnings chip, debt chip, rank badge when one exists ("#5 nationally · U.S. News" with link), share moved to secondary text.
+- Add a "Nationally ranked programs" strip *above* the popularity list for ranked majors that aren't in the top 5 by enrollment — this is precisely the school-rank ≠ major-rank story.
+- Every number gets a source affordance (feeds X1); suppressed/missing data renders as "not reported" rather than blank.
+- Make major names searchable (extend `/api/search` the same way S1 did for programs).
+
+**Research tasks (do these before building — each verifies a load-bearing assumption):**
+1. **Scorecard field-of-study API**: confirm exact nested field names and availability of 4-year earnings in the current release; confirm `&all_programs_nested=true` behavior and rate limits (1,000 req/hr default). Docs: https://collegescorecard.ed.gov/data/api-documentation/ and the Field of Study Data Documentation PDF: https://collegescorecard.ed.gov/assets/FieldOfStudyDataDocumentation.pdf. Pilot: pull UIUC + one small private end-to-end.
+2. **Suppression coverage**: field-of-study earnings are privacy-suppressed for small cohorts — measure what % of our 300 colleges' top-5 majors have usable earnings (known caveats write-ups: https://ticas.org/accountability/data-evidence-and-information/takeaways-from-new-program-level-data-on-the-college-scorecard/ and https://www.forbes.com/sites/michaeltnietzel/2019/11/21/six-caveats-when-using-the-college-scorecards-new-program-of-study-data/). Decide fallback display when suppressed.
+3. **CIP mapping**: build/verify a 2-digit-family ↔ 4-digit CIP ↔ friendly-name mapping (NCES CIP 2020 taxonomy, https://nces.ed.gov/ipeds/cipcode/) so today's `topMajors` families join cleanly to field-of-study rows.
+4. **US News program rankings**: enumerate which undergrad program rankings exist in the 2026 edition (https://www.usnews.com/best-colleges/rankings, e.g. CS: https://www.usnews.com/best-colleges/rankings/computer-science-overall) and how many of our top-100 colleges appear; confirm the attribution-not-reproduction approach with the licensing policy in the appendix.
+5. **Open rankings**: assess CSRankings (https://csrankings.org/) and CS Open Rankings (https://drafty.cs.brown.edu/csopenrankings/) for CS; identify equivalents for business/engineering/nursing or accept accreditation-only for those.
+6. **Accreditation datasets**: confirm bulk-downloadable program lists from ABET (https://www.abet.org), AACSB, CCNE — join by institution + program.
+7. **National baselines**: decide between computing CIP-level national medians from the Scorecard field-of-study file itself (self-consistent, free) vs BLS/Census ACS by degree field; prototype both for CS + Business + Psychology.
+8. **IPEDS Completions** (optional depth): degrees-conferred counts by 6-digit CIP (https://nces.ed.gov/ipeds/use-the-data) enable "one of the largest aerospace programs in the country" claims; assess whether completer counts from #1 suffice instead.
+
+**Acceptance criteria:** every college's majors section shows ≥1 outcome figure (earnings or debt) with source + year, or an explicit "not reported for this program"; the school-rank ≠ major-rank case is visible (a ranked-program badge can appear on a college regardless of overall rank); 100% of ranking rows have `sourceUrl` + `retrievedAt` + attribution; no US News list is reproduced wholesale; search finds colleges by major name.
+
+**Dependencies:** D1 (Scorecard plumbing, IPEDS IDs — done), X1 alignment for provenance display; pairs naturally with S1 (constituent-school ↔ ranked-major cross-references) and feeds C1 compare view.
 
 ---
 

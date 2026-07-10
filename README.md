@@ -88,7 +88,12 @@ The `College` schema supports the following Scorecard metrics:
     ```bash
     npx tsx scripts/refresh-scorecard.ts
     ```
-5.  **Export to JSON**: Commit local SQLite updates to the static JSON payload (`src/data/colleges.json`):
+5.  **Majors & Outcomes Refresh (Epic M1)**: Pull field-of-study data (top 10 bachelor's majors per college with median earnings 1/4 yrs after graduation, national medians for the same major, and federal loan debt) from the same Scorecard API:
+    ```bash
+    npx tsx scripts/refresh-majors.ts --dry-run   # preview
+    npx tsx scripts/refresh-majors.ts             # write to SQLite
+    ```
+6.  **Export to JSON**: Commit local SQLite updates to the static JSON payload (`src/data/colleges.json`):
     ```bash
     npx tsx scripts/export-db-to-json.ts
     ```

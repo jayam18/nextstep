@@ -18,6 +18,7 @@ export async function GET(request: Request) {
         // Every search term must match AT LEAST ONE field (AND logic across terms, OR logic across fields)
         return searchTerms.every(term => {
           const inName = college.name?.toLowerCase().includes(term);
+          const inAliases = college.aliases?.toLowerCase().includes(term);
           const inLocation = college.location?.toLowerCase().includes(term);
           const inTags = college.tags?.toLowerCase().includes(term);
           const inLocVibe = college.locationVibe?.toLowerCase().includes(term);
@@ -32,8 +33,10 @@ export async function GET(request: Request) {
             p.knownFor?.toLowerCase().includes(term) ||
             p.type.toLowerCase().includes(term)
           );
+          // M1: match majors ("aerospace", "nursing", "computer science")
+          const inMajors = college.majors?.some((m: any) => m.name.toLowerCase().includes(term));
 
-          return inName || inLocation || inTags || inLocVibe || inSocVibe || inAthVibe || inAcadVibe || inIdenVibe || inCareer || inPrograms;
+          return inName || inAliases || inLocation || inTags || inLocVibe || inSocVibe || inAthVibe || inAcadVibe || inIdenVibe || inCareer || inPrograms || inMajors;
         });
       });
 

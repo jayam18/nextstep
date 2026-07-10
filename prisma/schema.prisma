@@ -11,6 +11,7 @@ model College {
   id             String   @id @default(cuid())
   ranking        Int?
   name           String
+  aliases        String?  // comma-separated nicknames for search: "Caltech", "UIUC, U of I"
   location       String
   acceptanceRate Float
   tuition        Int
@@ -71,6 +72,9 @@ model College {
 
   // S1 Special programs & constituent colleges
   programs           CollegeProgram[]
+
+  // M1 Majors with outcomes
+  majors             CollegeMajor[]
   
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -92,6 +96,39 @@ model CollegeProgram {
   knownFor    String? // comma-separated: "CS, ECE, Aerospace"
   sourceUrl   String?
   college     College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+}
+
+model CollegeMajor {
+  id                        String  @id @default(cuid())
+  collegeId                 String
+  cipCode                   String   // 4-digit CIP without dot, e.g. "1107"
+  name                      String   // "Computer Science"
+  credential                String   // "bachelors"
+  degreesAwarded            Int?     // counts.ipeds_awards2
+  degreeShare               Float?   // % of the college's bachelor's degrees
+  medianEarnings1yr         Int?     // earnings.1_yr.overall_median_earnings
+  medianEarnings4yr         Int?     // earnings.4_yr.overall_median_earnings
+  medianEarnings4yrNational Int?     // earnings.4_yr.overall_median_earnings_national (same CIP+credential)
+  nationalP25               Int?     // earnings.4_yr.overall_p25_earnings_national
+  nationalP75               Int?     // earnings.4_yr.overall_p75_earnings_national
+  medianDebt                Int?     // debt.staff_grad_plus.all.eval_inst.median
+  medianMonthlyPayment      Int?     // debt.staff_grad_plus.all.eval_inst.median_payment
+  sourceUrl                 String
+  retrievedAt               DateTime @default(now())
+  rankings                  MajorRanking[]
+  college                   College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+}
+
+model MajorRanking {
+  id             String  @id @default(cuid())
+  collegeMajorId String
+  source         String   // "US News Undergrad CS" | "CSRankings" | "ABET accredited"
+  year           String   // "2026"
+  rank           Int?     // null for binary markers like accreditation
+  scope          String?  // "national", "public universities", specialty name
+  sourceUrl      String
+  retrievedAt    DateTime @default(now())
+  major          CollegeMajor @relation(fields: [collegeMajorId], references: [id], onDelete: Cascade)
 }
 
 model TuitionReciprocity {
