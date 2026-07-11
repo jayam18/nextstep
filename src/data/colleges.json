@@ -18834,6 +18834,16 @@
         "sourceUrl": "https://www.miami.edu/"
       },
       {
+        "id": "cmrgnn1440003lov0r5ympxfx",
+        "collegeId": "cmoqf31jc001jzgmbtcgzdi9d",
+        "name": "Miller Medical Scholars Program (7-Year BS/MD)",
+        "type": "accelerated",
+        "prominence": 1,
+        "description": "Highly selective seven-year path: three undergraduate years, then the Miller School of Medicine, with early clinical and research exposure.",
+        "knownFor": "BS/MD",
+        "sourceUrl": "https://students-residents.aamc.org/medical-school-admission-requirements/medical-schools-offering-combined-baccalaureate-md-programs-state-and-program-length-2025-2026"
+      },
+      {
         "id": "cmrcw7my80052wy4r6lp81d5s",
         "collegeId": "cmoqf31jc001jzgmbtcgzdi9d",
         "name": "Frost School of Music",
@@ -19309,6 +19319,16 @@
         "description": "One of the few top universities where undergraduates study in a dedicated school of public health and tropical medicine.",
         "knownFor": "Public Health",
         "sourceUrl": "https://tulane.edu/"
+      },
+      {
+        "id": "cmrgnn1450005lov0z2l2cbyk",
+        "collegeId": "cmoqf329r001lzgmbtmp8bntu",
+        "name": "Creative Premedical Scholars (Early Assurance)",
+        "type": "pre-med",
+        "prominence": 2,
+        "description": "Liberal-arts majors apply in sophomore spring for guaranteed admission to Tulane School of Medicine — no MCAT required; minimum 3.6 GPA and a BA/BFA in the School of Liberal Arts.",
+        "knownFor": "Early Assurance, Pre-Med",
+        "sourceUrl": "https://liberalarts.tulane.edu/academics/undergraduate-studies/accelerated-programs-professional-degrees/creative-premedical-scholars"
       },
       {
         "id": "cmrcw7my90059wy4rsn9sekcl",
@@ -21679,6 +21699,16 @@
         "description": "One of the top international-affairs schools in the world, blocks from the State Department and White House.",
         "knownFor": "International Affairs, Security Policy",
         "sourceUrl": "https://www.gwu.edu/"
+      },
+      {
+        "id": "cmrgnn1420001lov0elptjps1",
+        "collegeId": "cmoqf35i8001szgmbbu1wmi8c",
+        "name": "Seven-Year Dual BA/MD Program",
+        "type": "accelerated",
+        "prominence": 1,
+        "description": "Three undergraduate years followed by GW School of Medicine; provisional admission continues with a 3.60 GPA, no science grade below C, and medical service experience.",
+        "knownFor": "BA/MD",
+        "sourceUrl": "https://smhs.gwu.edu/academics/md-program/admissions/dual-programs/bamd"
       },
       {
         "id": "cmrcw7myd005uwy4rlkyl3k9t",

@@ -16,6 +16,7 @@ const PROGRAM_TYPE_LABELS: Record<string, string> = {
   'research': 'Research',
   'accelerated': 'Accelerated',
   'study-abroad': 'Study Abroad',
+  'pre-med': 'Pre-Med',
   'other': 'Signature',
 };
 

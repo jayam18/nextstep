@@ -1,6 +1,7 @@
-import { MapPin, Users, TrendingUp, DollarSign } from 'lucide-react';
+import { MapPin, Users, TrendingUp, DollarSign, HeartPulse } from 'lucide-react';
 import Image from 'next/image';
 import { getEffectiveTuition } from '@/lib/tuition';
+import { getPremedPath } from '@/lib/premed';
 
 interface CollegeCardProps {
   name: string;
@@ -27,6 +28,8 @@ interface CollegeCardProps {
   userStateCode?: string | null;
   // T2 Reciprocity Props
   reciprocity?: any[];
+  // S1 Programs (used for the pre-med path chip)
+  programs?: any[];
 }
 
 export default function CollegeCard({ 
@@ -51,9 +54,11 @@ export default function CollegeCard({
   tuitionOutOfState,
   avgNetPrice,
   userStateCode,
-  reciprocity
+  reciprocity,
+  programs
 }: CollegeCardProps) {
   const parsedTags = typeof tags === 'string' ? tags.split(',') : tags;
+  const premedPath = getPremedPath(programs);
 
   // Determine state-aware tuition with reciprocity helper
   const tuitionInStateVal = tuitionInState !== undefined ? tuitionInState : null;
@@ -177,6 +182,12 @@ export default function CollegeCard({
 
         {/* Categorical Vibes */}
         <div className="flex flex-wrap gap-2">
+          {premedPath && (
+            <span className="px-2.5 py-1 rounded-full bg-rose-500/10 text-xs font-semibold text-rose-300 border border-rose-500/25 inline-flex items-center gap-1">
+              <HeartPulse className="w-3 h-3" />
+              {premedPath === 'direct' ? 'Direct Med Path' : 'Med Early Assurance'}
+            </span>
+          )}
           {locationVibe && <span className="px-2.5 py-1 rounded-full bg-blue-500/10 text-xs font-medium text-blue-300 border border-blue-500/20">{locationVibe}</span>}
           {socialVibe && <span className="px-2.5 py-1 rounded-full bg-pink-500/10 text-xs font-medium text-pink-300 border border-pink-500/20">{socialVibe}</span>}
           {athleticsVibe && <span className="px-2.5 py-1 rounded-full bg-orange-500/10 text-xs font-medium text-orange-300 border border-orange-500/20">{athleticsVibe}</span>}
