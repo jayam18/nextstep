@@ -1,4 +1,6 @@
-import { MapPin, Users, TrendingUp, DollarSign, X, ExternalLink, BookOpen, Activity, GraduationCap, ShieldCheck, Trophy, Sparkles } from 'lucide-react';
+"use client";
+
+import { MapPin, Users, DollarSign, X, ExternalLink, BookOpen, Activity, GraduationCap, ShieldCheck, Trophy, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { getEffectiveTuition } from '@/lib/tuition';
@@ -20,8 +22,32 @@ const PROGRAM_TYPE_LABELS: Record<string, string> = {
   'other': 'Signature',
 };
 
+const JUMP_SECTIONS: [string, string][] = [
+  ['sec-costs', 'Costs'],
+  ['sec-aid', 'Aid'],
+  ['sec-majors', 'Majors'],
+  ['sec-programs', 'Programs'],
+  ['sec-campus', 'Campus'],
+];
+
 export default function CollegeModal({ college, userStateCode, onClose }: CollegeModalProps) {
   if (!college) return null;
+
+  const jumpTo = (id: string) => {
+    const el = document.getElementById(id);
+    const scroller = el?.closest('.custom-scrollbar');
+    if (!el || !scroller) return;
+    const offset = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 12;
+    scroller.scrollTo({ top: scroller.scrollTop + offset, behavior: 'smooth' });
+
+    // Flash the section heading so the eye lands on the right place.
+    // sec-costs is an empty anchor div — its heading equivalent is the stats grid that follows.
+    const target = (el.querySelector('h3') ?? el.nextElementSibling ?? el) as HTMLElement;
+    target.classList.remove('jump-flash');
+    void target.offsetWidth; // restart the animation if the same chip is clicked twice
+    target.classList.add('jump-flash');
+    window.setTimeout(() => target.classList.remove('jump-flash'), 1700);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -76,10 +102,25 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
           </div>
         </div>
 
+        {/* Jump navigation — fixed chrome, attached below the hero banner */}
+        <div className="flex-shrink-0 px-6 py-2 bg-gray-900/95 border-b border-white/10 flex flex-wrap items-center justify-center gap-2">
+          <span className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mr-1">Jump to</span>
+          {JUMP_SECTIONS.map(([id, label]) => (
+            <button
+              key={id}
+              onClick={() => jumpTo(id)}
+              className="px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-xs font-semibold text-blue-300 hover:bg-blue-500/25 hover:text-white cursor-pointer transition-colors"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
         {/* Scrollable Content */}
         <div className="p-6 overflow-y-auto custom-scrollbar">
-          
+
           {/* Quick Stats Grid */}
+          <div id="sec-costs" className="scroll-mt-14" />
           {(() => {
             const isPrivate = college.tuitionInState && college.tuitionOutOfState && college.tuitionInState === college.tuitionOutOfState;
             
@@ -96,7 +137,7 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
 
             return (
               <>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-4">
                   <div className="bg-white/5 border border-white/10 rounded-xl p-4">
                     <p className="text-gray-400 text-xs mb-1">Acceptance Rate</p>
                     <div className="text-xl font-bold text-white">{college.acceptanceRate}%</div>
@@ -104,10 +145,6 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
                   <div className="bg-white/5 border border-white/10 rounded-xl p-4">
                     <p className="text-gray-400 text-xs mb-1">Undergraduates</p>
                     <div className="text-xl font-bold text-white">{college.students.toLocaleString()}</div>
-                  </div>
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                    <p className="text-gray-400 text-xs mb-1">Avg GPA (Est.)</p>
-                    <div className="text-xl font-bold text-white">{college.avgGpa || 'N/A'}</div>
                   </div>
 
                   {isPrivate ? (
@@ -229,35 +266,35 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
                   <Activity className="w-5 h-5 mr-2 text-blue-400" />
                   Academic Requirements
                 </h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                    <span className="text-gray-400">SAT Math (Midpoint)</span>
-                    <span className="font-semibold text-white">{college.satMath || 'N/A'}</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                    <span className="text-gray-400">SAT Reading (Midpoint)</span>
-                    <span className="font-semibold text-white">{college.satReading || 'N/A'}</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                    <span className="text-gray-400">ACT Composite</span>
-                    <span className="font-semibold text-white">{college.actComposite || 'N/A'}</span>
-                  </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    ['SAT Math', college.satMath],
+                    ['SAT Reading', college.satReading],
+                    ['ACT Composite', college.actComposite],
+                    ['Avg GPA (Est.)', college.avgGpa],
+                  ].map(([label, value]) => (
+                    <div key={label as string} className="flex justify-between items-baseline gap-2 bg-white/5 border border-white/5 rounded-lg px-3 py-2">
+                      <span className="text-xs text-gray-400">{label}</span>
+                      <span className="text-sm font-semibold text-white">{value || 'N/A'}</span>
+                    </div>
+                  ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">*Scores reflect the midpoint of admitted students.</p>
+                <p className="text-[11px] text-gray-500 mt-2">*Test scores are midpoints of admitted students; GPA is an estimate.</p>
               </section>
 
               {/* Special Programs */}
-              <section>
+              <section id="sec-programs" className="scroll-mt-14">
                 <h3 className="flex items-center text-lg font-semibold text-white mb-3">
                   <BookOpen className="w-5 h-5 mr-2 text-purple-400" />
                   Special Programs
                 </h3>
                 {college.programs?.length ? (
                   <div className="space-y-3">
+                    <p className="text-[11px] text-gray-500 -mt-1">Hover over a program for details.</p>
                     {college.programs
                       .filter((p: any) => p.prominence === 1)
                       .map((p: any) => (
-                        <div key={p.id} className="rounded-xl p-4 bg-gradient-to-br from-purple-500/15 to-blue-500/10 border border-purple-500/30">
+                        <div key={p.id} className="group rounded-xl p-4 bg-gradient-to-br from-purple-500/15 to-blue-500/10 border border-purple-500/30">
                           <p className="text-[10px] uppercase tracking-wider text-purple-300 font-semibold mb-1">
                             🏛 Jewel of the university
                           </p>
@@ -269,7 +306,7 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
                               </a>
                             )}
                           </div>
-                          <p className="text-xs text-gray-300 leading-relaxed mt-1">{p.description}</p>
+                          <p className="hidden group-hover:block text-xs text-gray-300 leading-relaxed mt-1">{p.description}</p>
                           {p.knownFor && (
                             <div className="flex flex-wrap gap-1.5 mt-2">
                               {p.knownFor.split(',').map((field: string, i: number) => (
@@ -285,17 +322,19 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
                       {college.programs
                         .filter((p: any) => p.prominence > 1)
                         .map((p: any) => (
-                          <li key={p.id} className="bg-white/5 border border-white/5 rounded-lg p-3">
+                          <li key={p.id} className="group bg-white/5 border border-white/5 rounded-lg p-3 hover:border-purple-500/20 transition-colors">
                             <div className="flex items-start justify-between gap-2">
                               <span className="text-sm font-medium text-gray-200">{p.name}</span>
                               <span className="text-[10px] text-gray-400 bg-gray-800 px-2 py-0.5 rounded whitespace-nowrap flex-shrink-0">
                                 {PROGRAM_TYPE_LABELS[p.type] || 'Program'}
                               </span>
                             </div>
-                            <p className="text-xs text-gray-400 leading-relaxed mt-1">{p.description}</p>
-                            {p.knownFor && (
-                              <p className="text-[11px] text-purple-300/80 mt-1">{p.knownFor}</p>
-                            )}
+                            <div className="hidden group-hover:block">
+                              <p className="text-xs text-gray-400 leading-relaxed mt-1">{p.description}</p>
+                              {p.knownFor && (
+                                <p className="text-[11px] text-purple-300/80 mt-1">{p.knownFor}</p>
+                              )}
+                            </div>
                           </li>
                         ))}
                     </ul>
@@ -308,16 +347,17 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
               </section>
 
               {/* Paying for It (G1) */}
-              <section>
+              <section id="sec-aid" className="scroll-mt-14">
                 <h3 className="flex items-center text-lg font-semibold text-white mb-1">
                   <DollarSign className="w-5 h-5 mr-2 text-emerald-400" />
                   Paying for It
                 </h3>
                 {college.netPrice48_75k != null && (
-                  <p className="text-[11px] text-gray-500 mb-3">
+                  <p className="text-[11px] text-gray-500">
                     Families earning $48k–$75k typically pay ~${college.netPrice48_75k.toLocaleString()}/yr here after aid.
                   </p>
                 )}
+                <p className="text-[11px] text-gray-500 mb-3">Hover over a grant for award amounts and eligibility.</p>
                 {college.aid?.length ? (
                   <div className="space-y-2">
                     {(() => {
@@ -341,7 +381,7 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
                             <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mt-3 mb-1.5">{label}</p>
                             <ul className="space-y-2">
                               {entries.map((a: any) => (
-                                <li key={a.id} className={`rounded-lg p-3 border ${highlight ? 'relative mt-2 rotate-[-0.5deg] bg-emerald-500/10 border-emerald-500/25 shadow-[6px_6px_14px_rgba(0,0,0,0.45)]' : 'bg-white/5 border-white/5'}`}>
+                                <li key={a.id} className={`group rounded-lg p-3 border ${highlight ? 'relative mt-2 rotate-[-0.5deg] bg-emerald-500/10 border-emerald-500/25 shadow-[6px_6px_14px_rgba(0,0,0,0.45)]' : 'bg-white/5 border-white/5 hover:border-emerald-500/20'} transition-colors`}>
                                   {highlight && <span className="tape" aria-hidden="true" />}
                                   <div className="flex items-start justify-between gap-2">
                                     <span className={`text-sm font-medium ${highlight ? 'text-emerald-200' : 'text-gray-200'}`}>{a.name}</span>
@@ -349,17 +389,19 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
                                       <ExternalLink className="w-3.5 h-3.5" />
                                     </a>
                                   </div>
-                                  {(awardText(a) || a.awardNote) && (
-                                    <p className={`text-xs mt-1 ${highlight ? 'text-emerald-300' : 'text-gray-300'}`}>
-                                      {[awardText(a), a.awardNote].filter(Boolean).join(' — ')}
-                                    </p>
-                                  )}
-                                  {a.eligibility && <p className="text-[11px] text-gray-500 mt-1">{a.eligibility}</p>}
-                                  {a.howToApply && (
-                                    <span className="inline-block mt-1.5 px-2 py-0.5 bg-white/5 border border-white/10 rounded-full text-[10px] text-gray-400">
-                                      Apply: {a.howToApply}
-                                    </span>
-                                  )}
+                                  <div className="hidden group-hover:block">
+                                    {(awardText(a) || a.awardNote) && (
+                                      <p className={`text-xs mt-1 ${highlight ? 'text-emerald-300' : 'text-gray-300'}`}>
+                                        {[awardText(a), a.awardNote].filter(Boolean).join(' — ')}
+                                      </p>
+                                    )}
+                                    {a.eligibility && <p className="text-[11px] text-gray-500 mt-1">{a.eligibility}</p>}
+                                    {a.howToApply && (
+                                      <span className="inline-block mt-1.5 px-2 py-0.5 bg-white/5 border border-white/10 rounded-full text-[10px] text-gray-400">
+                                        Apply: {a.howToApply}
+                                      </span>
+                                    )}
+                                  </div>
                                 </li>
                               ))}
                             </ul>
@@ -377,26 +419,18 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
             {/* Right Column */}
             <div className="space-y-8">
               {/* Majors & Outcomes */}
-              <section>
+              <section id="sec-majors" className="scroll-mt-14">
                 <h3 className="flex items-center text-lg font-semibold text-white mb-1">
                   <GraduationCap className="w-5 h-5 mr-2 text-green-400" />
                   Top Majors
                 </h3>
                 {college.majors?.length ? (
                   <>
-                    <p className="text-[11px] text-gray-500 mb-3">
-                      Hover over a major to see typical earnings and loan debt.
-                    </p>
                     {(() => {
                       const renderMajor = (m: any) => {
-                        const vsNational = m.medianEarnings4yr && m.medianEarnings4yrNational
-                          ? m.medianEarnings4yr - m.medianEarnings4yrNational
-                          : null;
-                        const topQuartile = m.medianEarnings4yr && m.nationalP75 && m.medianEarnings4yr >= m.nationalP75;
-                        const aboveMedian = vsNational != null && vsNational >= 0;
                         const ranking = m.rankings?.[0];
                         return (
-                          <li key={m.id} className="group bg-white/5 rounded-lg p-3 border border-white/5 hover:border-green-500/20 transition-colors">
+                          <li key={m.id} className="bg-white/5 rounded-lg p-3 border border-white/5">
                             <div className="flex justify-between items-start gap-2">
                               <span className="text-sm font-medium text-gray-200">{m.name}</span>
                               {m.degreeShare != null && (
@@ -405,55 +439,22 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
                                 </span>
                               )}
                             </div>
-                            {(ranking || topQuartile || aboveMedian) && (
+                            {ranking && (
                               <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-                                {ranking && (
-                                  <a href={ranking.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-500/10 border border-amber-500/25 rounded-full text-[11px] text-amber-300 hover:bg-amber-500/20 transition-colors">
-                                    <Trophy className="w-3 h-3" />
-                                    {ranking.rank ? `#${ranking.rank}` : ''} {ranking.source} ({ranking.year})
-                                  </a>
-                                )}
-                                {topQuartile ? (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded-full text-[11px] text-emerald-300">
-                                    <TrendingUp className="w-3 h-3" />
-                                    Top 25% nationally · grad earnings
-                                  </span>
-                                ) : aboveMedian ? (
-                                  <span className="px-2 py-0.5 bg-emerald-500/5 border border-emerald-500/15 rounded-full text-[11px] text-emerald-300/80">
-                                    Above national median · grad earnings
-                                  </span>
-                                ) : null}
+                                <a href={ranking.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-500/10 border border-amber-500/25 rounded-full text-[11px] text-amber-300 hover:bg-amber-500/20 transition-colors">
+                                  <Trophy className="w-3 h-3" />
+                                  {ranking.rank ? `#${ranking.rank}` : ''} {ranking.source} ({ranking.year})
+                                </a>
                               </div>
                             )}
-                            <div className="hidden group-hover:block mt-2">
-                              {m.medianEarnings4yr ? (
-                                <div className="flex flex-wrap items-center gap-1.5">
-                                  <span className="px-2 py-0.5 bg-green-500/10 border border-green-500/20 rounded-full text-[11px] text-green-300">
-                                    Median ${Math.round(m.medianEarnings4yr / 1000)}k · 4 yrs after grad
-                                  </span>
-                                  {vsNational != null && (
-                                    <span className={`px-2 py-0.5 rounded-full text-[11px] border ${vsNational >= 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' : 'bg-white/5 border-white/10 text-gray-400'}`}>
-                                      {vsNational >= 0 ? '+' : '−'}${Math.round(Math.abs(vsNational) / 1000)}k vs national median
-                                    </span>
-                                  )}
-                                </div>
-                              ) : (
-                                <p className="text-[11px] text-gray-500">Earnings not reported for this program (cohort too small).</p>
-                              )}
-                              {m.medianDebt != null && (
-                                <p className="text-[11px] text-gray-500 mt-1.5">
-                                  Median federal loan debt at graduation: ${m.medianDebt.toLocaleString()}
-                                </p>
-                              )}
-                            </div>
                           </li>
                         );
                       };
-                      const topFive = college.majors.slice(0, 5);
+                      const visible = college.majors.slice(0, 5);
                       const rankedExtras = college.majors.slice(5).filter((m: any) => m.rankings?.length);
                       return (
                         <>
-                          <ul className="space-y-2">{topFive.map(renderMajor)}</ul>
+                          <ul className="space-y-2">{visible.map(renderMajor)}</ul>
                           {rankedExtras.length > 0 && (
                             <>
                               <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-amber-300/90 font-semibold mt-4 mb-2">
@@ -466,15 +467,6 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
                         </>
                       );
                     })()}
-                    <a
-                      href={college.majors[0].sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 justify-end mt-2 text-[11px] text-gray-500 hover:text-blue-400 transition-colors"
-                    >
-                      Earnings & debt: College Scorecard field-of-study data
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
                   </>
                 ) : college.topMajors ? (
                   <ul className="space-y-2">
@@ -496,7 +488,7 @@ export default function CollegeModal({ college, userStateCode, onClose }: Colleg
               </section>
 
               {/* Student Life */}
-              <section>
+              <section id="sec-campus" className="scroll-mt-14">
                 <h3 className="flex items-center text-lg font-semibold text-white mb-3">
                   <Sparkles className="w-5 h-5 mr-2 text-pink-400" />
                   Campus Vibe

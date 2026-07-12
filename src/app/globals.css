@@ -98,6 +98,28 @@
   opacity: 0.5;
 }
 
+/* Section highlight after a jump-nav click: brief blue flash that fades */
+@keyframes jump-flash {
+  0%,
+  25% {
+    background-color: rgba(59, 130, 246, 0.22);
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.12);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+.jump-flash {
+  animation: jump-flash 1.6s ease-out 1;
+  border-radius: 0.5rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .jump-flash {
+    animation: none;
+  }
+}
+
 /* Glossy tape strip — used once per college, on the aid pledge note */
 .tape {
   position: absolute;
