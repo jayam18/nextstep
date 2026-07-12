@@ -350,6 +350,8 @@ model MajorRanking {
 
 ## DB1 — Production database (infrastructure)
 
+**Status (July 2026):** Done. Prisma datasource switched to Postgres (Neon free tier via the Vercel Marketplace, `DATABASE_URL` in `.env`); all 4,707 rows migrated from SQLite via `scripts/migrate-sqlite-to-postgres.ts` with content verified identical; `colleges.json` remains the runtime read path; export script made deterministic (stable tiebreakers); feedback API persists to the same database (`src/lib/pg.ts` falls back to `DATABASE_URL`). `prisma/dev.db` is retained as the legacy migration source only. Unblocks R1 and F1-at-scale. Remaining nicety: set `ADMIN_TOKEN` in Vercel to read feedback via `GET /api/feedback` (or read rows in the Neon console).
+
 **Why:** Feedback (F1), review ingestion (R1), and eventually user accounts all need writable storage; the static-JSON model also makes every data refresh a redeploy. **Recommendation:** Vercel Postgres (Neon) free tier + switch Prisma datasource to it; keep `src/data/colleges.json` as the read path initially (it's fast and free), migrate reads later only if freshness demands it. Update `scripts/export-db-to-json.ts` to read from Postgres.
 
 ## X1 — Data provenance layer

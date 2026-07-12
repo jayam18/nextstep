@@ -8,17 +8,19 @@ async function main() {
   console.log("Exporting database to JSON...");
   
   const colleges = await prisma.college.findMany({
+    // Secondary sort keys keep the export deterministic — Postgres returns
+    // tied/unordered rows in arbitrary order, which would churn the JSON diff.
     include: {
-      careerPaths: true,
-      reciprocity: true,
+      careerPaths: { orderBy: { name: 'asc' } },
+      reciprocity: { orderBy: [{ program: 'asc' }, { eligibleStates: 'asc' }] },
       programs: {
-        orderBy: { prominence: 'asc' }
+        orderBy: [{ prominence: 'asc' }, { name: 'asc' }]
       },
       majors: {
-        orderBy: { degreesAwarded: 'desc' },
-        include: { rankings: true }
+        orderBy: [{ degreesAwarded: 'desc' }, { name: 'asc' }],
+        include: { rankings: { orderBy: { source: 'asc' } } }
       },
-      aid: true
+      aid: { orderBy: [{ kind: 'asc' }, { name: 'asc' }] }
     },
     orderBy: {
       ranking: 'asc'

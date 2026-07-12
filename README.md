@@ -35,6 +35,29 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
+## Production Database (Epic DB1)
+
+The Prisma datasource is **PostgreSQL** (Neon free tier via the Vercel Marketplace), configured through `DATABASE_URL` in `.env`. The site itself still reads college data from the static `src/data/colleges.json` — Postgres is the system of record that research scripts write to, and the feedback API's persistent store.
+
+**Data flow:** research scripts → Postgres (`DATABASE_URL`) → `scripts/export-db-to-json.ts` → `src/data/colleges.json` (committed) → API routes/components.
+
+`prisma/dev.db` is the **legacy SQLite database**, kept only as the migration source. Do not write to it; all scripts now target Postgres.
+
+### One-time migration (already-provisioned DB)
+
+```bash
+npx prisma db push                              # create tables in Postgres
+npx tsx scripts/migrate-sqlite-to-postgres.ts   # copy all rows from prisma/dev.db
+npx tsx scripts/export-db-to-json.ts            # re-export; git diff should be clean
+```
+
+The migration script refuses to run against a non-empty database unless passed `--force` (which wipes and re-copies).
+
+### Environment variables
+
+*   Local `.env`: `DATABASE_URL` — the Neon **direct** connection string (used by Prisma CLI and research scripts).
+*   Vercel: the Neon Marketplace integration injects `DATABASE_URL`/`POSTGRES_URL` automatically; the feedback API uses them at runtime (`FEEDBACK_DB_URL` → `POSTGRES_URL` → `DATABASE_URL`, first one set wins). Prefer the **pooled** string on Vercel.
+
 ## Feedback System (Epic F1)
 
 This project contains a user feedback collection system that captures bugs, feature suggestions, data corrections, and general feedback directly in the UI.
@@ -91,9 +114,9 @@ The `College` schema supports the following Scorecard metrics:
 5.  **Majors & Outcomes Refresh (Epic M1)**: Pull field-of-study data (top 10 bachelor's majors per college with median earnings 1/4 yrs after graduation, national medians for the same major, and federal loan debt) from the same Scorecard API:
     ```bash
     npx tsx scripts/refresh-majors.ts --dry-run   # preview
-    npx tsx scripts/refresh-majors.ts             # write to SQLite
+    npx tsx scripts/refresh-majors.ts             # write to Postgres
     ```
-6.  **Export to JSON**: Commit local SQLite updates to the static JSON payload (`src/data/colleges.json`):
+6.  **Export to JSON**: Commit database updates to the static JSON payload (`src/data/colleges.json`):
     ```bash
     npx tsx scripts/export-db-to-json.ts
     ```

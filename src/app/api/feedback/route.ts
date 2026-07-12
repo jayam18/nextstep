@@ -154,16 +154,20 @@ export async function GET(request: Request) {
       );
     }
 
-    // Verify Authorization header
+    // Accept the token via Authorization header or ?token= query param
+    // (the query param exists so feedback can be viewed directly in a browser).
     const authHeader = request.headers.get('Authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const queryToken = new URL(request.url).searchParams.get('token');
+    const token = authHeader?.startsWith('Bearer ')
+      ? authHeader.substring(7)
+      : queryToken;
+    if (!token) {
       return NextResponse.json(
-        { error: 'Unauthorized: Missing or invalid Authorization header' },
+        { error: 'Unauthorized: Provide a Bearer Authorization header or ?token= query param' },
         { status: 401 }
       );
     }
 
-    const token = authHeader.substring(7); // Remove 'Bearer '
     if (token !== adminToken) {
       return NextResponse.json(
         { error: 'Unauthorized: Invalid admin token' },

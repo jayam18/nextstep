@@ -5,7 +5,8 @@ let pool: Pool | null = null;
 export function getPgPool(): Pool | null {
   if (pool) return pool;
 
-  const connectionString = process.env.FEEDBACK_DB_URL || process.env.POSTGRES_URL;
+  const connectionString =
+    process.env.FEEDBACK_DB_URL || process.env.POSTGRES_URL || process.env.DATABASE_URL;
   if (!connectionString) {
     return null;
   }
