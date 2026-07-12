@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, SlidersHorizontal, Loader2, ChevronDown } from 'lucide-react';
+import { Search, Loader2, ChevronDown } from 'lucide-react';
 import CollegeCard from './CollegeCard';
 import CollegeModal from './CollegeModal';
 
@@ -16,20 +16,42 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
   const [isSearching, setIsSearching] = useState(false);
   const [userState, setUserState] = useState<string | null>(null);
   const [userStateCode, setUserStateCode] = useState<string | null>(null);
+  const [totalMatches, setTotalMatches] = useState<number | null>(null);
   const [selectedCollege, setSelectedCollege] = useState<any | null>(null);
 
   // Fetch user location on mount
   useEffect(() => {
     async function fetchLocation() {
       try {
-        const res = await fetch('https://ipapi.co/json/');
-        const data = await res.json();
-        if (data && data.region_code) {
-          setUserState(data.region); // e.g. "Illinois"
-          setUserStateCode(data.region_code); // e.g. "IL"
-          
+        // ipapi.co free tier rate-limits aggressively; cache the result for 24h
+        // so repeat visits don't silently lose the curated-for-state section.
+        let region: string | null = null;
+        let regionCode: string | null = null;
+        try {
+          const cached = JSON.parse(localStorage.getItem('ns-geo') || 'null');
+          if (cached && Date.now() - cached.ts < 24 * 60 * 60 * 1000) {
+            region = cached.region;
+            regionCode = cached.regionCode;
+          }
+        } catch { /* corrupt cache — refetch */ }
+
+        if (!regionCode) {
+          const res = await fetch('https://ipapi.co/json/');
+          if (!res.ok) throw new Error(`ipapi.co ${res.status}`);
+          const data = await res.json();
+          if (data && data.region_code) {
+            region = data.region; // e.g. "Illinois"
+            regionCode = data.region_code; // e.g. "IL"
+            localStorage.setItem('ns-geo', JSON.stringify({ region, regionCode, ts: Date.now() }));
+          }
+        }
+
+        if (regionCode) {
+          setUserState(region);
+          setUserStateCode(regionCode);
+
           // Fetch curated for state
-          const stateRes = await fetch(`/api/search?state=${data.region_code}`);
+          const stateRes = await fetch(`/api/search?state=${regionCode}`);
           const stateData = await stateRes.json();
           if (stateData.results && !stateData.fallback) {
             setResults(stateData.results);
@@ -68,6 +90,7 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
         const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
         const data = await res.json();
         setResults(data.results || []);
+        setTotalMatches(data.total ?? null);
       } catch (err) {
         console.error(err);
       } finally {
@@ -106,10 +129,6 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
                 placeholder="Search by name, city, state, or 'vibe' (e.g., 'Urban', 'STEM focus')..." 
                 className="w-full bg-transparent border-none text-white focus:ring-0 text-base md:text-lg placeholder-gray-500 py-3 outline-none"
               />
-              <button className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 transition-colors mr-2 border border-white/10">
-                <SlidersHorizontal className="w-4 h-4" />
-                Filters
-              </button>
             </div>
           </div>
           
@@ -174,6 +193,11 @@ export default function SearchDashboard({ initialColleges }: SearchDashboardProp
           <div className="text-center py-20">
             <p className="text-xl text-gray-400">No colleges found matching "{query}"</p>
           </div>
+        )}
+        {query && !isSearching && totalMatches != null && totalMatches > results.length && (
+          <p className="text-center text-sm text-gray-500 mt-8">
+            Showing the top {results.length} of {totalMatches} matches — add a state, major, or vibe to narrow it down.
+          </p>
         )}
       </section>
 

@@ -1,6 +1,25 @@
 import { NextResponse } from 'next/server';
 import collegesData from '@/data/colleges.json';
 
+// The dataset contains duplicate rows for some institutions (IPEDS matching
+// artifacts). Keep one row per name, preferring the one with a logo, then the
+// better (lower) ranking.
+function dedupeByName(colleges: any[]): any[] {
+  const seen = new Map<string, any>();
+  for (const c of colleges) {
+    const prev = seen.get(c.name);
+    if (!prev) {
+      seen.set(c.name, c);
+      continue;
+    }
+    const preferCurrent =
+      (!prev.logoUrl && c.logoUrl) ||
+      (!!prev.logoUrl === !!c.logoUrl && (c.ranking ?? Infinity) < (prev.ranking ?? Infinity));
+    if (preferCurrent) seen.set(c.name, c);
+  }
+  return [...seen.values()];
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -9,7 +28,7 @@ export async function GET(request: Request) {
 
     const colleges = collegesData as any[];
     // Pre-filter to only include colleges with an acceptance rate > 0
-    const validColleges = colleges.filter(c => c.acceptanceRate > 0);
+    const validColleges = dedupeByName(colleges.filter(c => c.acceptanceRate > 0));
 
     if (q) {
       const searchTerms = q.toLowerCase().split(' ').filter(t => t.trim() !== '');
@@ -40,7 +59,7 @@ export async function GET(request: Request) {
         });
       });
 
-      return NextResponse.json({ results: results.slice(0, 12) });
+      return NextResponse.json({ results: results.slice(0, 12), total: results.length });
     } else if (state) {
       // Curated by state
       const stateMatch = validColleges.filter(c => 

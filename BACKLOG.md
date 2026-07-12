@@ -41,6 +41,8 @@ Suggested dispatch order: **F1 → A1 → D1 → T1 → T2 → (G1, S1 in parall
 | X1 | Data provenance layer (every fact has a source) | P1 | Infra | D1 |
 | X2 | TypeScript models (kill the `any`s) | P2 | Tech debt | — |
 | C1 | College compare view (parent+student value prop) | P3 | Feature | T1, G1 |
+| C2 | Dedicated college profile pages (/college/[slug]) | P2 | Feature | — |
+| F2 | Real search filters (state, public/private, tuition ceiling, vibe) | P2 | Feature | — |
 
 ---
 
@@ -357,6 +359,20 @@ model MajorRanking {
 ## X2 — TypeScript models (tech debt)
 
 Define a `College` interface (and Aid/Program types) in `src/types/`; remove the `college: any` props in `CollegeCard.tsx`, `CollegeModal.tsx`, `SearchDashboard.tsx`, and API routes. Do this before the schema grows in T1/G1/S1 — every later item gets cheaper.
+
+## C2 — Dedicated college profile pages
+
+**Why:** The college modal has outgrown "quick look" — it now carries costs, reciprocity, aid (G1), majors with outcomes (M1), programs (S1), and campus content: ~25 blocks. July 2026 mitigations (headline-first sections with expanders, sticky jump chips, federal-aid one-liner) buy time, but the structural fix is a dedicated page.
+
+**What to build:** `/college/[slug]` route (static-generated from `colleges.json`; check `node_modules/next/dist/docs/` for current SSG conventions) with a sticky section nav; the modal becomes a light preview (stats, jewel program, aid pledge, top 3 majors) with "View full profile →". Slugs need a stable scheme (name-derived, handle dataset duplicates).
+
+**Payoffs:** solves modal density properly; **shareable URLs** (parents send links — the natural growth loop); SEO for a "first stop" product (300 indexed data-rich pages); natural home for C1 compare entry points and A2 per-college analytics.
+
+**Acceptance criteria:** every college has a canonical URL; modal preview links to it; page renders all modal content plus room to grow; Lighthouse SEO basics (title/description/OG tags per college).
+
+## F2 — Real search filters
+
+**Why:** The hero's "Filters" button was decorative (no handler) and was removed in July 2026 rather than ship dead UI. When built for real: filter panel over the existing search — state, public/private, tuition ceiling (state-aware effective tuition), acceptance-rate band, vibe chips, pre-med path, "has aid pledge". The search API already carries all these fields; the work is UI + query params + A2 events (`filter_applied`). Pairs with the "Showing top 12 of N matches" indicator, which creates the demand for narrowing.
 
 ## C1 — Compare view (future)
 
